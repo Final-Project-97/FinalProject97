@@ -41,8 +41,8 @@ erDiagram
         string name
         string avatarUrl
         string passwordHash
-        string role
-        string plan
+        enum role
+        enum plan
         int aiTokensRemaining
         object location
         datetime createdAt
@@ -61,7 +61,7 @@ erDiagram
         array colors
         string image360Url
         boolean isTopProduct
-        string status
+        enum status
         ObjectId createdBy FK
         datetime createdAt
         datetime updatedAt
@@ -80,9 +80,9 @@ erDiagram
 
     SUBSCRIPTION {
         ObjectId _id PK
-        ObjectId userId FK "UK"
-        string plan
-        string status
+        ObjectId userId FK UK
+        enum plan
+        enum status
         datetime startedAt
         datetime expiresAt
         string midtransSubscriptionId
@@ -96,7 +96,7 @@ erDiagram
         ObjectId subscriptionId FK
         string orderId UK
         number amount
-        string status
+        enum status
         string paymentType
         object midtransPayload
         datetime paidAt
@@ -142,7 +142,7 @@ erDiagram
     AI_USAGE_LOG {
         ObjectId _id PK
         ObjectId userId FK
-        string feature
+        enum feature
         int tokensUsed
         object metadata
         datetime createdAt
@@ -186,7 +186,7 @@ erDiagram
 | Car → Wishlist | 1 : N | Mobil bisa disimpan banyak user |
 | Car → Recommendation | 1 : N | Mobil direferensikan di `results[].carId` (embedded, bukan FK root) |
 | Car → User (admin) | N : 1 | Mobil dibuat oleh admin |
-| Subscription → Payment | 1 : N | Satu subscription bisa banyak payment (renewal) |
+| Subscription → Payment | 1 : N | Riwayat pembayaran monthly; setiap bayar = +30 hari premium |
 | Showroom ↔ Car | N : M | Showroom menyimpan array `carTypes` atau `carIds` |
 
 ### Relasi Alur Bisnis (bukan FK langsung)
@@ -339,7 +339,7 @@ erDiagram
     default: 'active'
   },
   startedAt: Date,
-  expiresAt: Date,           // null for free; set for premium
+  expiresAt: Date,           // null for free; startedAt + 30 days for premium_monthly
   midtransSubscriptionId: String,
   createdAt: Date,
   updatedAt: Date
@@ -366,7 +366,7 @@ erDiagram
     enum: ['pending', 'success', 'failed', 'expired', 'refunded'],
     default: 'pending'
   },
-  paymentType: String,       // "premium_monthly" | "premium_yearly"
+  paymentType: String,       // MVP: "premium_monthly" only (30 hari)
   midtransPayload: Object,   // full webhook/callback body
   paidAt: Date,
   createdAt: Date
@@ -597,6 +597,34 @@ Menyimpan input form dan output AI dari endpoint `POST /api/ai/recommend` (PRD �
 - **Messages embedded di `chat_sessions`** — conversation kecil, avoid join; cap 100 messages/session jika perlu.
 - **Results embedded di `recommendations`** — `carId` per item rekomendasi; tidak perlu collection junction terpisah.
 - **Subscription terpisah dari User** — memudahkan webhook Midtrans update tanpa touch user doc langsung (sync `users.plan` via hook).
+- **Premium monthly only (MVP)** — durasi 30 hari; setelah `expiresAt` lewat user harus subscribe ulang; tidak ada auto-renew.
+
+---
+
+## 4.1 Subscription Lifecycle (Premium Monthly)
+
+```
+FREE (5 tokens)
+    │
+    ▼ token habis / user upgrade
+MIDTRANS PAY (premium_monthly)
+    │
+    ▼ webhook success
+PREMIUM ACTIVE ── expiresAt = startedAt + 30 hari ── AI unlimited
+    │
+    ▼ expiresAt < now (cron/job)
+EXPIRED ── plan=free, status=expired, aiTokensRemaining=0 ── AI BLOCKED
+    │
+    ▼ user bayar lagi via Midtrans
+PREMIUM ACTIVE (+30 hari baru dari tanggal bayar)
+```
+
+| Status | `users.plan` | `subscriptions.status` | Akses AI |
+|--------|--------------|------------------------|----------|
+| Free (quota ada) | `free` | `active` | Ya, max 5x total |
+| Free (quota habis) | `free` | `active` | **Blocked** → prompt upgrade |
+| Premium aktif | `premium` | `active` | Unlimited |
+| Premium expired | `free` | `expired` | **Blocked** → prompt re-subscribe |
 
 ---
 
@@ -606,9 +634,13 @@ Menyimpan input form dan output AI dari endpoint `POST /api/ai/recommend` (PRD �
 |------|--------------|
 | Hanya 1 Top Product | Pre-save hook: jika `isTopProduct=true`, set semua car lain `false` |
 | Wishlist no duplicate | Compound unique index `{ userId, carId }` |
-| AI token tidak negatif | Pre-hook AI endpoint: check `aiTokensRemaining > 0` atau `plan=premium` |
-| Premium unlimited | Skip decrement jika `plan === 'premium'` |
+| Premium aktif | `plan=premium` AND `status=active` AND `expiresAt > now()` |
+| AI token tidak negatif | Pre-hook AI: premium aktif OR `aiTokensRemaining > 0` |
+| Premium unlimited | Skip decrement jika premium **aktif** (cek `expiresAt`) |
+| Premium expired | Cron/job: set `plan=free`, `status=expired`, `aiTokensRemaining=0`; blok AI |
+| Re-subscribe | Webhook Midtrans baru → `startedAt=now`, `expiresAt=now+30d`, `status=active`, `plan=premium` |
 | Free tier default | On user create: `aiTokensRemaining=5`, `plan='free'` |
+| Premium monthly only | `paymentType` enum MVP: `['premium_monthly']`; durasi = 30 hari |
 | Places cache TTL | TTL index on `expiresAt`, default 7 hari |
 | Geo nearest showroom | `$near` query on `showrooms.geoLocation` with `2dsphere` index |
 
@@ -624,10 +656,10 @@ sequenceDiagram
     participant AI as Groq/OpenAI
 
     U->>API: POST /api/ai/recommend
-    API->>DB: Find user (plan, aiTokensRemaining)
-    alt plan = free AND tokens = 0
-        API-->>U: 403 TOKEN_EXHAUSTED
-    else plan = premium OR tokens > 0
+    API->>DB: Find user + subscription (plan, expiresAt, aiTokensRemaining)
+    alt premium expired OR (free AND tokens = 0)
+        API-->>U: 403 TOKEN_EXHAUSTED / SUBSCRIPTION_EXPIRED
+    else premium active OR free tokens > 0
         API->>AI: LangChain prompt
         AI-->>API: Response
         API->>DB: Insert ai_usage_log
@@ -681,7 +713,7 @@ sequenceDiagram
 | POST `/api/ai/recommend` | budgetMin, budgetMax, carType, passengers, priority |
 | POST `/api/ai/chat` | sessionId?, message |
 | POST `/api/ai/credit-simulate` | carPrice, downPayment, tenureMonths, interestRate, carId? |
-| POST `/api/subscription/checkout` | paymentType |
+| POST `/api/subscription/checkout` | paymentType (`premium_monthly`) |
 
 ---
 

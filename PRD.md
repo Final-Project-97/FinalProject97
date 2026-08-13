@@ -13,7 +13,7 @@
 
 ## 1. Ringkasan Eksekutif
 
-Car Showroom AI adalah aplikasi web mobile-first yang membantu calon pembeli mobil menemukan tipe mobil, membandingkan warna, mensimulasikan kredit, dan menemukan showroom terdekat — dengan bantuan AI untuk rekomendasi dan chatbot.
+RAC (Recommendation Auto Car) AI adalah aplikasi web mobile-first yang membantu calon pembeli mobil menemukan tipe mobil, membandingkan warna, mensimulasikan kredit, dan menemukan showroom terdekat — dengan bantuan AI untuk rekomendasi dan chatbot.
 
 MVP difokuskan pada **satu alur utama**: user masuk → dapat rekomendasi mobil → lihat detail & warna → simpan ke wishlist → (opsional) simulasi kredit → temukan showroom terdekat. Fitur premium (AI unlimited) dijual via Midtrans.
 
@@ -43,17 +43,6 @@ MVP difokuskan pada **satu alur utama**: user masuk → dapat rekomendasi mobil 
 - Admin CRUD produk mobil (minimal)
 - Cache Google Places ke MongoDB
 
-### 2.3 Out of Scope (MVP)
-
-- Native mobile app (iOS/Android)
-- Multi-bahasa
-- Real-time inventory sync dengan dealer
-- Push notification
-- Review/rating user
-- Chat langsung dengan sales
-- Pembayaran DP mobil (hanya subscription SaaS)
-- Analytics dashboard lengkap
-
 ---
 
 ## 3. Persona Pengguna
@@ -77,21 +66,50 @@ MVP difokuskan pada **satu alur utama**: user masuk → dapat rekomendasi mobil 
 │  aiTokens=5 │                     │  aiTokens=0  │
 └─────────────┘                     └──────┬───────┘
                                          │
-                              Midtrans payment
+                              Midtrans payment (monthly)
                                          ▼
                                   ┌──────────────┐
                                   │   PREMIUM    │
-                                  │ aiTokens=∞   │
-                                  │ (or high cap)│
+                                  │ 30 hari aktif│
+                                  │ AI unlimited │
+                                  └──────┬───────┘
+                                         │
+                                   expiresAt lewat
+                                         ▼
+                                  ┌──────────────┐
+                                  │   EXPIRED    │
+                                  │ plan → free  │
+                                  │ AI blocked   │
+                                  └──────┬───────┘
+                                         │
+                              Subscribe lagi (Midtrans)
+                                         ▼
+                                  ┌──────────────┐
+                                  │   PREMIUM    │
+                                  │ +30 hari baru│
                                   └──────────────┘
 ```
 
-| Tier | AI Quota | Fitur |
-|------|----------|-------|
-| **Free** | 5 penggunaan (rekomendasi + chatbot + kredit AI = 1 token each) | Semua fitur UI, quota terbatas |
-| **Premium** | Unlimited / quota tinggi | Semua fitur AI tanpa batas |
+| Tier | Durasi | AI Quota | Fitur |
+|------|--------|----------|-------|
+| **Free** | Permanen | 5 penggunaan (rekomendasi + chatbot + kredit AI = 1 token each) | Semua fitur UI, quota terbatas |
+| **Premium Monthly** | **30 hari** per pembayaran | Unlimited | Semua fitur AI tanpa batas selama aktif |
+| **Expired** | — | **0 (blocked)** | UI tetap bisa; **semua fitur AI diblok** sampai subscribe ulang |
 
-**Token consumption:** Setiap panggilan ke endpoint AI (rekomendasi, chatbot message, simulasi kredit AI) mengurangi 1 token untuk user free.
+### Aturan Premium Monthly
+
+| Aturan | Detail |
+|--------|--------|
+| **Jenis plan** | Hanya `premium_monthly` (MVP tidak ada yearly) |
+| **Durasi** | 30 hari sejak `startedAt` → `expiresAt = startedAt + 30 hari` |
+| **Saat bayar sukses** | `plan=premium`, `status=active`, AI unlimited, decrement token di-skip |
+| **Saat expired** | `plan=free`, `status=expired`, `aiTokensRemaining=0`, **AI diblok** |
+| **Renewal** | **Manual** — user harus **subscribe lagi** via Midtrans; tidak ada auto-renew MVP |
+| **Setelah re-subscribe** | `expiresAt` diperpanjang +30 hari dari tanggal pembayaran baru |
+
+**Token consumption (free tier):** Setiap panggilan ke endpoint AI (rekomendasi, chatbot message, simulasi kredit AI) mengurangi 1 token.
+
+**Akses AI diizinkan jika:** `plan=premium` **DAN** `status=active` **DAN** `expiresAt > now` — jika tidak, perlakukan seperti free dengan token habis (`403 TOKEN_EXHAUSTED` / prompt upgrade).
 
 ---
 
@@ -209,11 +227,14 @@ MVP difokuskan pada **satu alur utama**: user masuk → dapat rekomendasi mobil 
 | ID | Requirement | Priority |
 |----|-------------|----------|
 | SU-01 | User baru: `plan=free`, `aiTokensRemaining=5` | P0 |
-| SU-02 | Decrement token on AI usage | P0 |
-| SU-03 | Halaman upgrade premium + harga | P0 |
-| SU-04 | Midtrans Snap / subscription payment flow | P0 |
-| SU-05 | Webhook Midtrans → update status premium | P0 |
-| SU-06 | Tampilkan badge plan di profil | P1 |
+| SU-02 | Decrement token on AI usage (free tier only) | P0 |
+| SU-03 | Halaman upgrade premium monthly + harga | P0 |
+| SU-04 | Midtrans Snap payment flow (`paymentType: premium_monthly`) | P0 |
+| SU-05 | Webhook Midtrans → aktifkan premium 30 hari (`startedAt`, `expiresAt`) | P0 |
+| SU-06 | Tampilkan badge plan + tanggal expired di profil | P1 |
+| SU-07 | Cron/job cek `expiresAt`: jika lewat → downgrade `plan=free`, `status=expired`, `aiTokensRemaining=0` | P0 |
+| SU-08 | Setelah expired, **blok semua endpoint AI** + prompt subscribe ulang | P0 |
+| SU-09 | Re-subscribe: pembayaran Midtrans baru → perpanjang premium +30 hari | P0 |
 
 ---
 
@@ -282,9 +303,9 @@ MVP difokuskan pada **satu alur utama**: user masuk → dapat rekomendasi mobil 
 ### Subscription
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/api/subscription/status` | Plan + tokens |
-| POST | `/api/subscription/checkout` | Create Midtrans transaction |
-| POST | `/api/subscription/webhook` | Midtrans callback |
+| GET | `/api/subscription/status` | Plan, tokens, `expiresAt`, days remaining |
+| POST | `/api/subscription/checkout` | Create Midtrans transaction (`premium_monthly` only) |
+| POST | `/api/subscription/webhook` | Midtrans callback → activate/extend premium |
 
 ---
 
@@ -324,12 +345,17 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A[AI Token = 0] --> B[Modal Upgrade]
+    A[AI Token = 0 / Premium expired] --> B[Modal Upgrade Premium Monthly]
     B --> C[Midtrans Checkout]
     C --> D{Payment Success?}
-    D -->|Yes| E[Webhook → plan=premium]
     D -->|No| F[Toast Error]
-    E --> G[Unlimited AI]
+    D -->|Yes| E[Webhook: plan=premium, expiresAt=now+30d]
+    E --> G[Unlimited AI selama 30 hari]
+    G --> H{expiresAt lewat?}
+    H -->|Ya| I[Downgrade: plan=free, AI blocked]
+    I --> J[User harus subscribe lagi]
+    J --> B
+    H -->|Belum| G
 ```
 
 ---
@@ -366,7 +392,8 @@ flowchart TD
 - [ ] Mobile layout diuji di viewport 375px
 - [ ] Auth Google + JWT berfungsi
 - [ ] AI token decrement + block saat habis
-- [ ] Midtrans payment sandbox success → premium active
+- [ ] Midtrans payment sandbox success → premium active 30 hari
+- [ ] Premium expired → AI blocked + prompt re-subscribe
 - [ ] Wishlist CRUD lengkap dengan toast & confirm delete
 - [ ] Minimal 5 mobil seed data dengan warna & gambar
 - [ ] README setup local + env variables documented
@@ -408,6 +435,7 @@ VITE_MIDTRANS_CLIENT_KEY=
 | Term | Definisi |
 |------|----------|
 | **Top Product** | Satu mobil unggulan di homepage dengan view 360° |
-| **AI Token** | Kuota penggunaan fitur AI per user free tier |
+| **AI Token** | Kuota penggunaan fitur AI per user free tier (5x) |
+| **Premium Monthly** | Langganan berbayar 30 hari via Midtrans; AI unlimited selama aktif; expired = harus subscribe ulang |
 | **CI360** | cloudimage-360-view library untuk rotasi produk |
 | **Mongoloquent** | ODM/ORM untuk MongoDB di Node.js |
