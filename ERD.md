@@ -22,16 +22,6 @@ ERD MVP Lite: **5 koleksi MongoDB** untuk data yang perlu persist.
 | 4 | `subscriptions` | Langganan premium **+ riwayat pembayaran Midtrans** (digabung) |
 | 5 | `ai_usage_logs` | Audit trail konsumsi token AI |
 
-**Tidak disimpan di MongoDB:**
-
-| Fitur | Alasan |
-|-------|--------|
-| Rekomendasi AI | Hasil langsung ke UI; user simpan ke `wishlists` |
-| Chatbot sesi | Stateless per request; tidak perlu `chat_sessions` |
-| Simulasi kredit | Perhitungan real-time; tidak perlu `credit_simulations` |
-| Showroom | Google Places **runtime only** (1x/session frontend); fallback dari `config/showrooms.seed.json` (bukan collection) |
-| `places_cache` | Dihapus — fetch 1x/session di frontend |
-
 ---
 
 ## 2. Diagram Relasi (Mermaid)
