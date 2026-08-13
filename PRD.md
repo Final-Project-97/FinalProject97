@@ -1,9 +1,9 @@
 # Product Requirements Document (PRD)
-## Car Showroom AI — MVP
+## Car Showroom AI — MVP Lite
 
 | Field | Value |
 |-------|-------|
-| **Versi** | 1.0 (MVP) |
+| **Versi** | 1.2 (MVP Lite + CarAPI) |
 | **Timeline** | 7 hari penuh |
 | **Tim** | 4 orang |
 | **Platform** | Web SPA, mobile-first |
@@ -13,9 +13,11 @@
 
 ## 1. Ringkasan Eksekutif
 
-RAC (Recommendation Auto Car) AI adalah aplikasi web mobile-first yang membantu calon pembeli mobil menemukan tipe mobil, membandingkan warna, mensimulasikan kredit, dan menemukan showroom terdekat — dengan bantuan AI untuk rekomendasi dan chatbot.
+Car Showroom AI adalah aplikasi web mobile-first yang membantu calon pembeli mobil menemukan tipe mobil, membandingkan warna, mensimulasikan kredit, dan menemukan showroom terdekat — dengan bantuan AI untuk rekomendasi dan chatbot.
 
 MVP difokuskan pada **satu alur utama**: user masuk → dapat rekomendasi mobil → lihat detail & warna → simpan ke wishlist → (opsional) simulasi kredit → temukan showroom terdekat. Fitur premium (AI unlimited) dijual via Midtrans.
+
+**MVP Lite:** katalog mobil via **CarAPI.app sync** + override manual; showroom **seed** + Google Places **1x/session** (Opsi A); **tanpa admin panel**; auth **Google buyer only**.
 
 ---
 
@@ -30,18 +32,28 @@ MVP difokuskan pada **satu alur utama**: user masuk → dapat rekomendasi mobil 
 | 3 | Monetisasi freemium via Midtrans | Flow pembayaran end-to-end berhasil |
 | 4 | Auth Google + wishlist berfungsi | Login & CRUD wishlist tanpa error |
 
-### 2.2 In Scope (MVP)
+### 2.2 In Scope (MVP Lite)
 
 - Homepage: banner Top Product dengan view 360° (CI360)
-- Form rekomendasi mobil + output AI (tipe, warna, link showroom terdekat)
+- Form rekomendasi mobil + output AI (tipe, warna, CTA showroom terdekat)
 - Halaman detail produk: deskripsi, swap gambar per warna, ketersediaan warna
 - Chatbot AI (LangChain + Groq/OpenAI)
 - Simulasi kredit (form + perhitungan AI-assisted)
-- Auth: Sign in with Google + JWT, role `buyer` / `admin`
+- Auth: Sign in with Google + JWT, role **`buyer` only**
 - CRUD wishlist
-- Subscription freemium: free 5x AI → token habis → upgrade premium (Midtrans)
-- Admin CRUD produk mobil (minimal)
-- Cache Google Places ke MongoDB
+- Subscription freemium: free 5x AI → token habis → upgrade premium monthly (Midtrans)
+- **Katalog mobil:** sync **[CarAPI.app](https://carapi.app/)** (specs YMMT) → MongoDB + **enrichment manual** (harga IDR, warna, CI360)
+- **Showroom terdekat:** Google Places (Opsi A) + fallback seed; **1x fetch per session** di frontend
+
+### 2.4 Keputusan Scope MVP Lite
+
+| Area | Keputusan | Catatan |
+|------|-----------|---------|
+| **Katalog mobil** | **CarAPI.app sync** + `config/car-enrichment.json` | Specs otomatis; harga IDR, warna, 360° manual |
+| **Showroom** | Opsi A: Places → fallback seed `$near` | Seed min. 3 showroom (Jakarta) |
+| **Google Places** | **1x per session** (frontend Context + `sessionStorage`) | Backend stateless |
+| **Admin** | Skip | Sync via script; enrichment via JSON |
+| **Auth** | Google OAuth buyer only | JWT 24h |
 
 ---
 
@@ -51,10 +63,6 @@ MVP difokuskan pada **satu alur utama**: user masuk → dapat rekomendasi mobil 
 - Usia 25–45, mobile-first
 - Butuh rekomendasi cepat tanpa datang ke showroom dulu
 - Freemium: coba AI 5 kali, upgrade jika puas
-
-### 3.2 Admin
-- Staff showroom / product owner
-- Kelola katalog mobil, set Top Product, monitor subscription (basic)
 
 ---
 
@@ -124,10 +132,11 @@ MVP difokuskan pada **satu alur utama**: user masuk → dapat rekomendasi mobil 
 | Detail colors | One image per color | Image swap on select |
 | Server | Node.js + Express | REST API |
 | Validation | Zod | Request schemas |
-| Auth | JWT + bcrypt + Google OAuth | Roles: buyer, admin |
+| Auth | JWT + Google OAuth | Role: **buyer only** |
 | Database | MongoDB | Atlas or local |
 | ORM | Mongoloquent | Models + validation |
-| Maps | Google Places API | Cache to MongoDB |
+| Car catalog | [CarAPI.app](https://carapi.app/) | Sync specs (server-side); free demo dataset 2015–2020 |
+| Maps | Google Places API | Live 1x/session; no MongoDB cache |
 | AI | Groq / OpenAI + LangChain | Chatbot & recommendations |
 | Payment | Midtrans | Subscription SaaS |
 
@@ -143,7 +152,7 @@ MVP difokuskan pada **satu alur utama**: user masuk → dapat rekomendasi mobil 
 | HP-02 | Integrasi **CI360** untuk rotasi 360° pada Top Product | P0 |
 | HP-03 | Section **AI Recommendation**: form input (budget, kebutuhan, penumpang, dll.) | P0 |
 | HP-04 | Output rekomendasi: tipe mobil, pilihan warna, CTA ke detail | P0 |
-| HP-05 | CTA **Showroom Terdekat** berdasarkan geolocation user | P0 |
+| HP-05 | CTA **Showroom Terdekat** dari session state (sudah di-fetch 1x) | P0 |
 | HP-06 | Navigasi ke chatbot, auth, wishlist | P1 |
 
 **Form Rekomendasi (contoh field):**
@@ -194,7 +203,6 @@ MVP difokuskan pada **satu alur utama**: user masuk → dapat rekomendasi mobil 
 | CR-02 | Output: cicilan bulanan, total bunga, total bayar | P0 |
 | CR-03 | AI memberikan insight singkat (affordable / tips) | P1 |
 | CR-04 | Pre-fill harga dari detail produk | P1 |
-| CR-05 | Simpan histori simulasi (logged-in user) | P2 |
 
 ---
 
@@ -204,9 +212,8 @@ MVP difokuskan pada **satu alur utama**: user masuk → dapat rekomendasi mobil 
 |----|-------------|----------|
 | AU-01 | Sign in with Google (OAuth 2.0) | P0 |
 | AU-02 | Issue JWT (access token, expiry 24h) | P0 |
-| AU-03 | Role: `buyer` (default), `admin` | P0 |
-| AU-04 | Protected routes: wishlist, subscription, admin | P0 |
-| AU-05 | Admin login alternatif email+password (bcrypt) — opsional MVP | P2 |
+| AU-03 | Role fixed: `buyer` (default & only) | P0 |
+| AU-04 | Protected routes: wishlist, subscription | P0 |
 
 ---
 
@@ -238,24 +245,82 @@ MVP difokuskan pada **satu alur utama**: user masuk → dapat rekomendasi mobil 
 
 ---
 
-### 6.8 Showroom & Google Places
+### 6.8 Showroom & Google Places (Opsi A)
 
 | ID | Requirement | Priority |
 |----|-------------|----------|
-| SH-01 | Cari showroom terdekat berdasarkan lat/lng user | P0 |
-| SH-02 | Cache response Google Places ke MongoDB (TTL 7 hari) | P0 |
-| SH-03 | Tampilkan nama, alamat, jarak, link Google Maps | P0 |
-| SH-04 | Admin CRUD showroom manual (fallback jika Places limit) | P1 |
+| SH-01 | **Session init (frontend):** minta GPS 1x → panggil `GET /api/showrooms/nearby?lat=&lng=` **1x per session** | P0 |
+| SH-02 | Simpan hasil di **React Context** + `sessionStorage` (semua CTA showroom baca dari sini, tanpa API ulang) | P0 |
+| SH-03 | **Backend Opsi A:** coba Google Places → sukses return Places; gagal/kosong → fallback `showrooms` seed (`$near`) | P0 |
+| SH-04 | Response API sertakan `source: "google_places" \| "seed"` | P0 |
+| SH-05 | Tampilkan nama, alamat, jarak, link Google Maps | P0 |
+| SH-06 | GPS ditolak → default koordinat Jakarta → fetch nearby 1x | P1 |
+
+**Alur backend nearby (Opsi A):**
+
+```
+GET /api/showrooms/nearby?lat=&lng=
+  1. Call Google Places API (car dealer, radius ~10 km)
+  2. IF sukses && hasil tidak kosong → return { source: "google_places", data: [...] }
+  3. ELSE → query showrooms seed (geoLocation $near) → return { source: "seed", data: [...] }
+```
+
+**Seed showroom:** min. 3 record area Jakarta dengan `geoLocation` (2dsphere) sebagai fallback demo.
 
 ---
 
-### 6.9 Admin (Minimal MVP)
+### 6.9 Katalog Mobil (CarAPI.app Sync + Enrichment)
 
 | ID | Requirement | Priority |
 |----|-------------|----------|
-| AD-01 | CRUD mobil (nama, harga, specs, colors, images, 360 URL) | P0 |
-| AD-02 | Set/unset Top Product (hanya 1 aktif) | P0 |
-| AD-03 | Kelola ketersediaan warna per mobil | P0 |
+| CT-01 | Sync job: fetch makes/models/trims dari **CarAPI.app** → upsert ke MongoDB `cars` | P0 |
+| CT-02 | Mapper: CarAPI fields → schema `cars` (name, brand, slug, type, specs, description) | P0 |
+| CT-03 | **Enrichment manual** via `config/car-enrichment.json` merge saat sync | P0 |
+| CT-04 | Enrichment wajib isi: `basePrice` (IDR), `colors[]`, `thumbnailUrl`; Top Product: `image360Url` | P0 |
+| CT-05 | Tepat 1 mobil `isTopProduct: true` (set di enrichment) | P0 |
+| CT-06 | API **read-only** user-facing: `GET /api/cars`, `/top`, `/:id` | P0 |
+| CT-07 | Trigger sync: `npm run sync:cars` dan/atau `POST /api/internal/sync/cars` (dev-only) | P0 |
+
+**Field dari CarAPI (otomatis):**
+
+| CarAPI | → `cars` |
+|--------|----------|
+| make | brand |
+| model + trim | name |
+| body type | type (SUV/MPV/Sedan mapping) |
+| engine, transmission, fuel | specs |
+| MSRP / description | description (MSRP **tidak** dipakai langsung sebagai harga jual IDR) |
+
+**Field dari enrichment (manual `config/car-enrichment.json`):**
+
+```json
+{
+  "toyota-camry-xle": {
+    "basePrice": 450000000,
+    "isTopProduct": true,
+    "image360Url": "https://cdn.example.com/360/camry/",
+    "colors": [
+      { "name": "Pearl White", "hexCode": "#F5F5F5", "imageUrl": ".../white.jpg", "availability": "available" }
+    ]
+  }
+}
+```
+
+**Alur sync:**
+
+```
+npm run sync:cars
+  1. Login CarAPI (JWT) — production; atau demo dataset tanpa akun (dev)
+  2. Fetch trims by filter (e.g. Toyota, Honda, MPV/SUV)
+  3. Map → upsert cars by slug
+  4. Merge car-enrichment.json (override basePrice, colors, 360°, isTopProduct)
+  5. Log: created / updated / skipped
+```
+
+**Catatan CarAPI MVP demo:**
+- Free public dataset: **2015–2020**, no signup — cukup untuk pipeline sync POC
+- Production go-live: subscribe CarAPI (Base ~$199/tahun) untuk dataset lengkap
+- CarAPI **server-side only** (no CORS) — sync wajib di backend
 
 ---
 
@@ -268,15 +333,17 @@ MVP difokuskan pada **satu alur utama**: user masuk → dapat rekomendasi mobil 
 | GET | `/api/auth/me` | Current user + subscription |
 | POST | `/api/auth/logout` | Invalidate token (client-side) |
 
-### Cars
+### Cars (read-only, data from CarAPI sync)
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/api/cars` | List cars (filter, paginate) |
+| GET | `/api/cars` | List cars from MongoDB (synced + enriched) |
 | GET | `/api/cars/top` | Top Product for homepage |
 | GET | `/api/cars/:id` | Detail + colors + availability |
-| POST | `/api/cars` | Admin create |
-| PUT | `/api/cars/:id` | Admin update |
-| DELETE | `/api/cars/:id` | Admin delete |
+
+### Internal (dev-only)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/internal/sync/cars` | Trigger CarAPI sync + enrichment merge |
 
 ### AI
 | Method | Endpoint | Description |
@@ -296,9 +363,7 @@ MVP difokuskan pada **satu alur utama**: user masuk → dapat rekomendasi mobil 
 ### Showrooms
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/api/showrooms/nearby?lat=&lng=` | Nearest showrooms |
-| GET | `/api/showrooms` | List all (admin) |
-| POST | `/api/showrooms` | Admin create |
+| GET | `/api/showrooms/nearby?lat=&lng=` | Places (Opsi A) → fallback seed; **called 1x/session from frontend** |
 
 ### Subscription
 | Method | Endpoint | Description |
@@ -315,7 +380,7 @@ MVP difokuskan pada **satu alur utama**: user masuk → dapat rekomendasi mobil 
 |----------|-------------|
 | **Performance** | FCP < 2s mobile 4G; API response < 500ms (non-AI) |
 | **Responsive** | Mobile-first; breakpoints: 375px, 768px, 1024px |
-| **Security** | JWT httpOnly cookie or Bearer; Zod validation all inputs; bcrypt admin passwords |
+| **Security** | JWT httpOnly cookie or Bearer; Zod validation all inputs |
 | **Availability** | MVP target 99% uptime (best effort) |
 | **AI Fallback** | Graceful error jika Groq/OpenAI down |
 | **Accessibility** | Semantic HTML, contrast ratio WCAG AA (best effort MVP) |
@@ -337,7 +402,7 @@ flowchart TD
     G --> H[Tampilkan Mobil + Warna]
     H --> I[Detail Produk]
     H --> J[Simpan Wishlist]
-    H --> K[Showroom Terdekat]
+    H --> K[Showroom Terdekat dari session state]
     I --> L[Simulasi Kredit]
 ```
 
@@ -358,19 +423,57 @@ flowchart TD
     H -->|Belum| G
 ```
 
+### 9.3 Flow Showroom Session (1x per session)
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant FE as Frontend
+    participant BE as Backend
+    participant GP as Google Places
+    participant DB as MongoDB
+
+    U->>FE: Buka app / login
+    FE->>U: Minta GPS (1x)
+    U->>FE: lat, lng
+    FE->>BE: GET /showrooms/nearby (1x per session)
+    BE->>GP: Nearby search
+    alt Places OK
+        GP-->>BE: dealer list
+        BE-->>FE: source=google_places
+    else Places fail / empty
+        BE->>DB: showrooms seed $near
+        DB-->>BE: seed list
+        BE-->>FE: source=seed
+    end
+    FE->>FE: Simpan Context + sessionStorage
+
+    Note over FE: Semua CTA Showroom Terdekat<br/>baca session state — no API recall
+```
+
+### 9.4 Flow Car Sync (CarAPI + Enrichment)
+
+```mermaid
+flowchart LR
+    A[CarAPI.app] -->|fetch trims/specs| B[Sync Service]
+    C[car-enrichment.json] -->|merge override| B
+    B -->|upsert| D[(MongoDB cars)]
+    E[Frontend GET /api/cars] --> D
+```
+
 ---
 
 ## 10. Pembagian Tim (7 Hari)
 
 | Hari | Frontend (2 dev) | Backend (1 dev) | Full-stack / AI (1 dev) |
 |------|------------------|-----------------|-------------------------|
-| **D1** | Setup React + Tailwind + routing | Express + Mongo + auth scaffold | AI/LangChain POC + schema design |
-| **D2** | Homepage + CI360 + layout mobile | Car CRUD API + Zod | Google OAuth + JWT |
+| **D1** | Setup React + Tailwind + ShowroomProvider | Express + Mongo + CarAPI sync POC | AI/LangChain POC + schema |
+| **D2** | Homepage + CI360 + GPS session init | CarAPI mapper + enrichment merge + read API | Google OAuth + JWT |
 | **D3** | Detail produk + color swap | Wishlist API | AI recommend endpoint |
-| **D4** | Form rekomendasi UI + results | Showrooms + Places cache | Chatbot LangChain |
-| **D5** | Chatbot UI + credit form | Subscription + Midtrans | Credit AI simulation |
-| **D6** | Wishlist pages + auth flows | Admin routes + webhook | Integration testing |
-| **D7** | Polish UI + toast/swal | Bug fixes + seed data | E2E test + deploy |
+| **D4** | Form rekomendasi UI + results | Showrooms Opsi A (Places + seed) | Chatbot LangChain |
+| **D5** | Chatbot UI + credit form | Subscription + Midtrans webhook | Credit AI simulation |
+| **D6** | Wishlist + auth flows | Expiry cron + seed showrooms | Integration testing |
+| **D7** | Polish UI + toast/swal | E2E sync + deploy | E2E test + deploy |
 
 ---
 
@@ -378,7 +481,8 @@ flowchart TD
 
 | Risiko | Impact | Mitigasi |
 |--------|--------|----------|
-| Google Places API quota | Showroom gagal load | Cache agresif + data showroom manual |
+| CarAPI quota / demo dataset limit | Katalog terbatas | Free tier 2015–2020 untuk dev; filter 5–10 model; enrichment lengkap |
+| Google Places API quota / error | Showroom gagal load | Opsi A fallback seed; Places 1x/session |
 | AI latency tinggi | UX buruk | Loading skeleton; Groq sebagai primary |
 | Midtrans sandbox delay | Testing terhambat | Setup sandbox day 1 |
 | CI360 asset belum siap | Homepage kosong | Fallback static hero image |
@@ -395,7 +499,11 @@ flowchart TD
 - [ ] Midtrans payment sandbox success → premium active 30 hari
 - [ ] Premium expired → AI blocked + prompt re-subscribe
 - [ ] Wishlist CRUD lengkap dengan toast & confirm delete
-- [ ] Minimal 5 mobil seed data dengan warna & gambar
+- [ ] CarAPI sync + enrichment merge menghasilkan **5–10 mobil** di MongoDB
+- [ ] 1 Top Product + CI360 + colors[] dari enrichment
+- [ ] **3 showroom** seed (fallback Places)
+- [ ] Showroom: Places 1x/session + fallback seed teruji
+- [ ] `npm run sync:cars` documented di README
 - [ ] README setup local + env variables documented
 
 ---
@@ -412,6 +520,11 @@ JWT_SECRET=
 GOOGLE_CLIENT_ID=
 GOOGLE_CLIENT_SECRET=
 GOOGLE_PLACES_API_KEY=
+
+# CarAPI (https://carapi.app) — server-side sync only
+CARAPI_API_TOKEN=
+CARAPI_API_SECRET=
+SYNC_SECRET=                    # guard POST /api/internal/sync/cars
 
 # AI
 GROQ_API_KEY=
@@ -438,4 +551,8 @@ VITE_MIDTRANS_CLIENT_KEY=
 | **AI Token** | Kuota penggunaan fitur AI per user free tier (5x) |
 | **Premium Monthly** | Langganan berbayar 30 hari via Midtrans; AI unlimited selama aktif; expired = harus subscribe ulang |
 | **CI360** | cloudimage-360-view library untuk rotasi produk |
+| **CarAPI Sync** | Pipeline backend: fetch specs dari CarAPI.app → upsert MongoDB |
+| **Enrichment** | Override manual via `config/car-enrichment.json` (harga IDR, warna, CI360) |
+| **Showroom Session** | Fetch nearby 1x per browser session |
+| **Opsi A** | Places primary, seed fallback |
 | **Mongoloquent** | ODM/ORM untuk MongoDB di Node.js |

@@ -1,13 +1,11 @@
 # Entity Relationship Diagram (ERD)
-## Car Showroom AI — MVP
+## Car Showroom AI — MVP Lite
 
 | Field | Value |
 |-------|-------|
 | **Database** | MongoDB (NoSQL) |
 | **ORM** | Mongoloquent |
-| **Versi** | 1.0 (MVP) |
-
-> MongoDB menggunakan dokumen embedded & referensi (`ObjectId`). Diagram di bawah menggunakan notasi relasional untuk kejelasan, dengan catatan implementasi MongoDB di setiap entitas.
+| **Versi** | 1.2 (MVP Lite + CarAPI) |
 
 ---
 
@@ -15,34 +13,34 @@
 
 ```mermaid
 erDiagram
-    USER ||--o{ WISHLIST : owns
-    USER ||--o| SUBSCRIPTION : has
-    USER ||--o{ PAYMENT : makes
-    USER ||--o{ CHAT_SESSION : has
-    USER ||--o{ CREDIT_SIMULATION : creates
-    USER ||--o{ AI_USAGE_LOG : consumes
-    USER ||--o{ RECOMMENDATION : generates
-
-    CAR ||--o{ WISHLIST : "saved in"
-    CAR ||--o{ CREDIT_SIMULATION : "simulated for"
-    CAR ||--o{ RECOMMENDATION : "referenced in results"
-    CAR }o--|| USER : "created by admin"
-
+    %% --- RELASI ---
     SHOWROOM ||--o{ CAR : "may stock"
-    
+    USER ||--o| SUBSCRIPTION : has
+
     SUBSCRIPTION ||--o{ PAYMENT : "paid via"
+    USER ||--o{ PAYMENT : makes
 
-    PLACES_CACHE }|--|| SHOWROOM : "cached from"
+    USER ||--o{ WISHLIST : owns
+    CAR ||--o{ WISHLIST : "saved in"
 
+    USER ||--o{ CREDIT_SIMULATION : creates
+    CAR ||--o{ CREDIT_SIMULATION : "simulated for"
+
+    USER ||--o{ RECOMMENDATION : generates
+    CAR ||--o{ RECOMMENDATION : "referenced in results"
+
+    USER ||--o{ CHAT_SESSION : has
+    USER ||--o{ AI_USAGE_LOG : consumes
+
+    %% --- ENTITAS ---
     USER {
         ObjectId _id PK
         string email UK
         string googleId UK
         string name
         string avatarUrl
-        string passwordHash
-        enum role
-        enum plan
+        string role
+        string plan
         int aiTokensRemaining
         object location
         datetime createdAt
@@ -60,47 +58,15 @@ erDiagram
         array specs
         array colors
         string image360Url
+        string thumbnailUrl
         boolean isTopProduct
-        enum status
-        ObjectId createdBy FK
+        string status
+        string externalSource
+        string externalId
+        datetime syncedAt
+        datetime enrichedAt
         datetime createdAt
         datetime updatedAt
-    }
-
-    WISHLIST {
-        ObjectId _id PK
-        ObjectId userId FK
-        ObjectId carId FK
-        string selectedColor
-        string notes
-        string source
-        datetime createdAt
-        datetime updatedAt
-    }
-
-    SUBSCRIPTION {
-        ObjectId _id PK
-        ObjectId userId FK UK
-        enum plan
-        enum status
-        datetime startedAt
-        datetime expiresAt
-        string midtransSubscriptionId
-        datetime createdAt
-        datetime updatedAt
-    }
-
-    PAYMENT {
-        ObjectId _id PK
-        ObjectId userId FK
-        ObjectId subscriptionId FK
-        string orderId UK
-        number amount
-        enum status
-        string paymentType
-        object midtransPayload
-        datetime paidAt
-        datetime createdAt
     }
 
     SHOWROOM {
@@ -116,10 +82,38 @@ erDiagram
         datetime updatedAt
     }
 
-    CHAT_SESSION {
+    SUBSCRIPTION {
+        ObjectId _id PK
+        ObjectId userId FK "UK"
+        string plan
+        string status
+        datetime startedAt
+        datetime expiresAt
+        string midtransSubscriptionId
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    PAYMENT {
         ObjectId _id PK
         ObjectId userId FK
-        array messages
+        ObjectId subscriptionId FK
+        string orderId UK
+        number amount
+        string status
+        string paymentType
+        object midtransPayload
+        datetime paidAt
+        datetime createdAt
+    }
+
+    WISHLIST {
+        ObjectId _id PK
+        ObjectId userId FK
+        ObjectId carId FK
+        string selectedColor
+        string notes
+        string source
         datetime createdAt
         datetime updatedAt
     }
@@ -139,26 +133,6 @@ erDiagram
         datetime createdAt
     }
 
-    AI_USAGE_LOG {
-        ObjectId _id PK
-        ObjectId userId FK
-        enum feature
-        int tokensUsed
-        object metadata
-        datetime createdAt
-    }
-
-    PLACES_CACHE {
-        ObjectId _id PK
-        string cacheKey UK
-        string query
-        number lat
-        number lng
-        object response
-        datetime cachedAt
-        datetime expiresAt
-    }
-
     RECOMMENDATION {
         ObjectId _id PK
         ObjectId userId FK
@@ -166,9 +140,24 @@ erDiagram
         array results
         datetime createdAt
     }
-```
 
-> **Catatan `recommendations`:** Relasi ke `cars` tidak via FK root field, melainkan **`results[].carId`** (embedded reference). Relasi ke `wishlists` hanya di **alur bisnis** (user simpan mobil dari hasil rekomendasi dengan `source: 'recommendation'`), bukan foreign key langsung.
+    CHAT_SESSION {
+        ObjectId _id PK
+        ObjectId userId FK
+        array messages
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    AI_USAGE_LOG {
+        ObjectId _id PK
+        ObjectId userId FK
+        string feature
+        int tokensUsed
+        object metadata
+        datetime createdAt
+    }
+```
 
 ---
 
@@ -185,17 +174,19 @@ erDiagram
 | User → Recommendation | 1 : N | Histori hasil AI rekomendasi (`userId` FK; nullable untuk guest trial) |
 | Car → Wishlist | 1 : N | Mobil bisa disimpan banyak user |
 | Car → Recommendation | 1 : N | Mobil direferensikan di `results[].carId` (embedded, bukan FK root) |
-| Car → User (admin) | N : 1 | Mobil dibuat oleh admin |
 | Subscription → Payment | 1 : N | Riwayat pembayaran monthly; setiap bayar = +30 hari premium |
-| Showroom ↔ Car | N : M | Showroom menyimpan array `carTypes` atau `carIds` |
+| Showroom ↔ Car | N : M | Showroom seed: `carTypes` / `carIds` (logis) |
+
 
 ### Relasi Alur Bisnis (bukan FK langsung)
 
 | Alur | Keterangan |
 |------|------------|
-| Recommendation → Wishlist | User menyimpan mobil dari output rekomendasi ke wishlist (`wishlists.source = 'recommendation'`) |
-| Recommendation → Showroom | Showroom terdekat di-resolve saat runtime dari `users.location` + Google Places, tidak disimpan di `recommendations` |
-| Recommendation ↔ AiUsageLog | Satu panggilan `POST /api/ai/recommend` menulis keduanya (log token + histori rekomendasi) |
+| CarAPI.app → cars | Sync job fetch trims/specs → upsert by `slug`; merge enrichment JSON |
+| Recommendation → Wishlist | `wishlists.source = 'recommendation'` |
+| User location → Showroom | GPS → nearby 1x/session → Places Opsi A atau seed |
+| Recommendation → Showroom | CTA baca frontend session state |
+| Recommendation ↔ AiUsageLog | Satu AI recommend → log + recommendation doc |
 
 ---
 
@@ -207,13 +198,12 @@ erDiagram
 {
   _id: ObjectId,
   email: String,           // required, unique, indexed
-  googleId: String,        // unique, sparse (null for admin-only)
+  googleId: String,        // unique, required for MVP Lite
   name: String,
   avatarUrl: String,
-  passwordHash: String,    // optional, admin email login only
   role: {
     type: String,
-    enum: ['buyer', 'admin'],
+    enum: ['buyer'],         // MVP Lite: buyer only
     default: 'buyer'
   },
   plan: {
@@ -242,29 +232,31 @@ erDiagram
 
 ---
 
-### 3.2 `cars`
+### 3.2 `cars` (CarAPI sync + enrichment)
+
+Populated by sync job (`npm run sync:cars`), **not** manual seed or user-facing write API.
 
 ```javascript
 {
   _id: ObjectId,
-  name: String,              // e.g. "Avanza Veloz"
-  brand: String,             // e.g. "Toyota"
-  slug: String,              // unique, URL-friendly
-  type: String,              // SUV | MPV | Sedan | Hatchback | Pickup
-  basePrice: Number,         // IDR
+  name: String,              // mapped from CarAPI model + trim
+  brand: String,             // CarAPI make
+  slug: String,              // unique, URL-friendly (upsert key)
+  type: String,              // SUV | MPV | Sedan | Hatchback | Pickup (mapped from body)
+  basePrice: Number,         // IDR — from enrichment ONLY (not CarAPI MSRP)
   description: String,
   specs: {
     engine: String,
     transmission: String,
     fuelType: String,
     seats: Number,
-    mileage: String          // "km/l"
+    mileage: String
   },
-  colors: [                  // EMBEDDED — one image per color
+  colors: [                  // from enrichment ONLY
     {
-      name: String,            // "Pearl White"
-      hexCode: String,         // "#FFFFFF"
-      imageUrl: String,        // swap target on detail page
+      name: String,
+      hexCode: String,
+      imageUrl: String,
       availability: {
         type: String,
         enum: ['available', 'limited', 'out_of_stock'],
@@ -272,21 +264,32 @@ erDiagram
       }
     }
   ],
-  image360Url: String,       // CI360 source (Top Product only)
-  thumbnailUrl: String,
+  image360Url: String,       // enrichment (Top Product)
+  thumbnailUrl: String,      // enrichment
   isTopProduct: {
     type: Boolean,
-    default: false           // only ONE true at a time (app logic)
+    default: false           // exactly ONE true via enrichment
   },
   status: {
     type: String,
     enum: ['active', 'inactive'],
     default: 'active'
   },
-  createdBy: ObjectId,       // ref: users
+  externalSource: {
+    type: String,
+    enum: ['carapi'],
+    default: 'carapi'
+  },
+  externalId: String,        // CarAPI trim/id for re-sync
+  syncedAt: Date,            // last CarAPI fetch
+  enrichedAt: Date,            // last enrichment merge
   createdAt: Date,
   updatedAt: Date
 }
+
+// Upsert key: { slug: 1 } unique
+// Sync: CarAPI → map → merge config/car-enrichment.json → upsert
+// User API: GET only
 
 // Indexes
 // { slug: 1 } unique
@@ -379,7 +382,9 @@ erDiagram
 
 ---
 
-### 3.6 `showrooms`
+### 3.6 `showrooms` (seed fallback + Places Opsi A)
+
+Data seed dipakai saat Google Places gagal/kosong. Response Places **tidak** disimpan ke MongoDB.
 
 ```javascript
 {
@@ -387,7 +392,7 @@ erDiagram
   name: String,
   address: String,
   phone: String,
-  googlePlaceId: String,     // unique, sparse
+  googlePlaceId: String,     // optional on seed records
   geoLocation: {
     type: {
       type: String,
@@ -396,8 +401,8 @@ erDiagram
     },
     coordinates: [Number]      // [longitude, latitude]
   },
-  carTypes: [String],          // ["MPV", "SUV"] — types available
-  carIds: [ObjectId],          // optional: specific cars in stock
+  carTypes: [String],          // ["MPV", "SUV"]
+  carIds: [ObjectId],          // optional: ref cars in seed
   isActive: {
     type: Boolean,
     default: true
@@ -405,6 +410,10 @@ erDiagram
   createdAt: Date,
   updatedAt: Date
 }
+
+// MVP Lite: min 3 seed records (Jakarta area) for $near fallback
+// Primary source at runtime: Google Places API (not persisted)
+// Backend: GET /showrooms/nearby → Places first, else seed $near
 
 // Indexes
 // { geoLocation: '2dsphere' }  — geospatial queries
@@ -533,39 +542,17 @@ Menyimpan input form dan output AI dari endpoint `POST /api/ai/recommend` (PRD �
 
 ---
 
-### 3.11 `places_cache`
-
-```javascript
-{
-  _id: ObjectId,
-  cacheKey: String,          // e.g. "nearby:-6.2:106.8:5000" (lat:lng:radius)
-  query: String,
-  lat: Number,
-  lng: Number,
-  radius: Number,            // meters
-  response: Object,          // raw Google Places API response
-  cachedAt: Date,
-  expiresAt: Date            // TTL index target
-}
-
-// Indexes
-// { cacheKey: 1 } unique
-// { expiresAt: 1 } TTL index — MongoDB auto-delete expired docs
-```
-
----
-
 ## 4. Diagram Embedded vs Referenced
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                        cars                                  │
+│  Source: CarAPI.app sync + car-enrichment.json merge        │
 │  ┌─────────────────────────────────────────────────────┐    │
-│  │ colors[] (EMBEDDED)                                  │    │
-│  │  ├── name, hexCode, imageUrl, availability          │    │
-│  │  └── ...                                             │    │
+│  │ colors[] (EMBEDDED — from enrichment)               │    │
+│  │ specs (EMBEDDED — mapped from CarAPI)               │    │
+│  │ externalSource, externalId, syncedAt, enrichedAt    │    │
 │  └─────────────────────────────────────────────────────┘    │
-│  specs (EMBEDDED object)                                     │
 └─────────────────────────────────────────────────────────────┘
 
 ┌──────────────┐         ObjectId ref         ┌──────────────┐
@@ -593,15 +580,79 @@ Menyimpan input form dan output AI dari endpoint `POST /api/ai/recommend` (PRD �
 ```
 
 **Keputusan desain:**
-- **Colors embedded di `cars`** — MVP: warna selalu tied to product, tidak perlu collection terpisah; swap image = lookup array by `name`.
-- **Messages embedded di `chat_sessions`** — conversation kecil, avoid join; cap 100 messages/session jika perlu.
-- **Results embedded di `recommendations`** — `carId` per item rekomendasi; tidak perlu collection junction terpisah.
-- **Subscription terpisah dari User** — memudahkan webhook Midtrans update tanpa touch user doc langsung (sync `users.plan` via hook).
-- **Premium monthly only (MVP)** — durasi 30 hari; setelah `expiresAt` lewat user harus subscribe ulang; tidak ada auto-renew.
+- **CarAPI + enrichment** — specs otomatis; harga IDR, warna, CI360 dari `config/car-enrichment.json`
+- **Colors embedded di `cars`** — swap image by color name on detail page
+- **Messages embedded di `chat_sessions`**
+- **Results embedded di `recommendations`**
+- **Subscription terpisah dari User** — Midtrans webhook sync
+- **Showroom seed** — fallback Places Opsi A; frontend fetch 1x/session
 
 ---
 
-## 4.1 Subscription Lifecycle (Premium Monthly)
+## 4.1 Car Sync (CarAPI.app + Enrichment)
+
+```
+[CarAPI.app] ──JWT/server-side──► [Sync Service]
+                                      │
+[config/car-enrichment.json] ──merge──┤
+                                      ▼
+                               upsert by slug
+                                      │
+                                      ▼
+                               [(MongoDB cars)]
+
+[Frontend] ──GET /api/cars──► MongoDB (read-only)
+```
+
+| Sumber | Field contoh | Persisted? |
+|--------|--------------|------------|
+| CarAPI | brand, name, specs, description, externalId | Ya |
+| Enrichment | basePrice (IDR), colors[], image360Url, isTopProduct | Ya (override) |
+| CarAPI MSRP USD | — | **Tidak dipakai** langsung |
+
+**Enrichment example (`config/car-enrichment.json`):**
+
+```json
+{
+  "toyota-camry-xle": {
+    "basePrice": 450000000,
+    "isTopProduct": true,
+    "image360Url": "https://cdn.example.com/360/camry/",
+    "thumbnailUrl": "https://cdn.example.com/camry/thumb.jpg",
+    "colors": [
+      { "name": "Pearl White", "hexCode": "#F5F5F5", "imageUrl": ".../white.jpg", "availability": "available" }
+    ]
+  }
+}
+```
+
+---
+
+## 4.2 Showroom Resolution (Opsi A + Session)
+
+```
+[Frontend — 1x per session]
+  App init → GPS → GET /api/showrooms/nearby?lat=&lng=
+  → store in React Context + sessionStorage
+
+[Backend — Opsi A]
+  1. googlePlacesNearby(lat, lng)
+  2. if OK && results.length → { source: "google_places", data }
+  3. else → Showroom.find({ geoLocation: { $near: ... } })
+           → { source: "seed", data }
+
+[Subsequent UI]
+  Homepage / Detail / Rekomendasi CTA → read session state (no API)
+```
+
+| `source` | Asal data | Persisted? |
+|----------|-----------|------------|
+| `google_places` | Google Places API | Tidak (live response) |
+| `seed` | Collection `showrooms` | Ya (seed data) |
+
+---
+
+## 4.3 Subscription Lifecycle (Premium Monthly)
 
 ```
 FREE (5 tokens)
@@ -632,8 +683,13 @@ PREMIUM ACTIVE (+30 hari baru dari tanggal bayar)
 
 | Rule | Implementasi |
 |------|--------------|
-| Hanya 1 Top Product | Pre-save hook: jika `isTopProduct=true`, set semua car lain `false` |
-| Wishlist no duplicate | Compound unique index `{ userId, carId }` |
+| Car sync upsert | Upsert `cars` by `{ slug }`; set `syncedAt`, `externalSource: 'carapi'` |
+| Enrichment merge | After CarAPI map, merge `car-enrichment.json` by slug; set `enrichedAt` |
+| Harga IDR | `basePrice` **only** from enrichment — never raw CarAPI MSRP |
+| Hanya 1 Top Product | Enrichment: exactly one `isTopProduct: true` |
+| User cars API | GET only — no POST/PUT/DELETE for buyers |
+| Showroom Opsi A | Places first; fallback seed `$near`; return `source` |
+| Showroom 1x/session | Frontend Context + sessionStorage |
 | Premium aktif | `plan=premium` AND `status=active` AND `expiresAt > now()` |
 | AI token tidak negatif | Pre-hook AI: premium aktif OR `aiTokensRemaining > 0` |
 | Premium unlimited | Skip decrement jika premium **aktif** (cek `expiresAt`) |
@@ -641,8 +697,8 @@ PREMIUM ACTIVE (+30 hari baru dari tanggal bayar)
 | Re-subscribe | Webhook Midtrans baru → `startedAt=now`, `expiresAt=now+30d`, `status=active`, `plan=premium` |
 | Free tier default | On user create: `aiTokensRemaining=5`, `plan='free'` |
 | Premium monthly only | `paymentType` enum MVP: `['premium_monthly']`; durasi = 30 hari |
-| Places cache TTL | TTL index on `expiresAt`, default 7 hari |
-| Geo nearest showroom | `$near` query on `showrooms.geoLocation` with `2dsphere` index |
+| Geo nearest showroom | `$near` on `showrooms.geoLocation` (fallback path only) |
+| Wishlist no duplicate | Compound unique index `{ userId, carId }` |
 
 ---
 
@@ -673,32 +729,30 @@ sequenceDiagram
 
 ---
 
-## 7. Seed Data Minimum (MVP)
+## 7. Initial Data (MVP)
 
-| Collection | Min Records | Notes |
-|------------|-------------|-------|
-| users | 2 | 1 admin, 1 buyer test |
-| cars | 5 | 1 Top Product with 360 URL |
-| showrooms | 3 | With geoLocation Jakarta area |
-| subscriptions | 1 | Free tier for test buyer |
-| recommendations | 3 | Sample AI results linked to test buyer + cars |
+| Collection | Min Records | Sumber |
+|------------|-------------|--------|
+| users | 2+ | Google OAuth test accounts |
+| cars | 5–10 | **CarAPI sync** + enrichment |
+| showrooms | 3+ | **Seed script** (Jakarta fallback) |
+| subscriptions | 1+ | Test buyer free tier |
+| recommendations | 3+ | Sample AI output (optional) |
 
-**Contoh car seed:**
+**Contoh enrichment entry** (bukan full car doc — specs dari CarAPI):
 
-```javascript
+```json
 {
-  name: "Innova Zenix",
-  brand: "Toyota",
-  slug: "toyota-innova-zenix",
-  type: "MPV",
-  basePrice: 450000000,
-  isTopProduct: true,
-  image360Url: "https://cdn.example.com/360/innova-zenix/",
-  colors: [
-    { name: "Platinum White", hexCode: "#F5F5F5", imageUrl: ".../white.jpg", availability: "available" },
-    { name: "Attitude Black", hexCode: "#1A1A1A", imageUrl: ".../black.jpg", availability: "available" },
-    { name: "Crimson Red", hexCode: "#8B0000", imageUrl: ".../red.jpg", availability: "limited" }
-  ]
+  "honda-cr-v-ex-l": {
+    "basePrice": 520000000,
+    "isTopProduct": true,
+    "image360Url": "https://cdn.example.com/360/crv/",
+    "thumbnailUrl": "https://cdn.example.com/crv/thumb.jpg",
+    "colors": [
+      { "name": "Platinum White", "hexCode": "#F5F5F5", "imageUrl": ".../white.jpg", "availability": "available" },
+      { "name": "Crystal Black", "hexCode": "#1A1A1A", "imageUrl": ".../black.jpg", "availability": "available" }
+    ]
+  }
 }
 ```
 
@@ -708,12 +762,12 @@ sequenceDiagram
 
 | Endpoint | Zod Schema Fields |
 |----------|-------------------|
-| POST `/api/cars` | name, brand, type, basePrice, description, specs, colors[], image360Url |
 | POST `/api/wishlist` | carId, selectedColor?, notes?, source? |
 | POST `/api/ai/recommend` | budgetMin, budgetMax, carType, passengers, priority |
 | POST `/api/ai/chat` | sessionId?, message |
 | POST `/api/ai/credit-simulate` | carPrice, downPayment, tenureMonths, interestRate, carId? |
 | POST `/api/subscription/checkout` | paymentType (`premium_monthly`) |
+| POST `/api/internal/sync/cars` | (dev-only) header `X-Sync-Secret` |
 
 ---
 
@@ -722,23 +776,24 @@ sequenceDiagram
 | Collection | Est. Docs (MVP) | Growth |
 |------------|-----------------|--------|
 | users | 100 | Linear |
-| cars | 10–50 | Slow |
-| wishlists | 500 | Linear with users |
+| cars | 5–10 | Sync refresh (not user growth) |
+| showrooms | 3–5 | Fixed (seed) |
+| wishlists | 500 | Linear |
 | subscriptions | = users | 1:1 |
 | payments | 50 | With conversions |
-| chat_sessions | 200 | Per active user |
-| credit_simulations | 300 | Per user interest |
-| ai_usage_logs | 1000 | High — consider archival |
+| chat_sessions | 200 | Per user |
+| credit_simulations | 300 | Per user |
+| ai_usage_logs | 1000 | High |
 | recommendations | 500 | Per AI call |
-| places_cache | 100 | Bounded by TTL |
-| showrooms | 10–20 | Slow |
 
 ---
 
 ## 10. Future Extensions (Post-MVP)
 
-- Collection `notifications` untuk push/email
-- Collection `car_comparisons` untuk compare 2–3 mobil side-by-side
-- Separate `colors` collection jika katalog warna shared antar model
-- `dealers` entity terpisah dari `showrooms`
+- **`places_cache`** — cache Google Places
+- **Admin panel** — CRUD mobil/showroom UI
+- **API katalog Indonesia** — Carapis, dealer API (harga OTR IDR native)
+- **Paid CarAPI tier** — dataset lengkap 2020+ untuk production
+- Collection `notifications`
+- Collection `car_comparisons`
 - Sharding `ai_usage_logs` by month
