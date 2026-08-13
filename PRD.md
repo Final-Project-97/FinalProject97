@@ -1,9 +1,9 @@
 # Product Requirements Document (PRD)
-## Car Showroom AI — MVP Lite
+## RAC (Recommendation Auto Car) AI — MVP Lite
 
 | Field | Value |
 |-------|-------|
-| **Versi** | 1.2 (MVP Lite + CarAPI) |
+| **Versi** | 1.3 (MVP Lite + CarAPI + ERD simplification) |
 | **Timeline** | 7 hari penuh |
 | **Tim** | 4 orang |
 | **Platform** | Web SPA, mobile-first |
@@ -13,7 +13,7 @@
 
 ## 1. Ringkasan Eksekutif
 
-Car Showroom AI adalah aplikasi web mobile-first yang membantu calon pembeli mobil menemukan tipe mobil, membandingkan warna, mensimulasikan kredit, dan menemukan showroom terdekat — dengan bantuan AI untuk rekomendasi dan chatbot.
+RAC (Recommendation Auto Car) AI adalah aplikasi web mobile-first yang membantu calon pembeli mobil menemukan tipe mobil, membandingkan warna, mensimulasikan kredit, dan menemukan showroom terdekat — dengan bantuan AI untuk rekomendasi dan chatbot.
 
 MVP difokuskan pada **satu alur utama**: user masuk → dapat rekomendasi mobil → lihat detail & warna → simpan ke wishlist → (opsional) simulasi kredit → temukan showroom terdekat. Fitur premium (AI unlimited) dijual via Midtrans.
 
@@ -50,7 +50,7 @@ MVP difokuskan pada **satu alur utama**: user masuk → dapat rekomendasi mobil 
 | Area | Keputusan | Catatan |
 |------|-----------|---------|
 | **Katalog mobil** | **CarAPI.app sync** + `config/car-enrichment.json` | Specs otomatis; harga IDR, warna, 360° manual |
-| **Showroom** | Opsi A: Places → fallback seed `$near` | Seed min. 3 showroom (Jakarta) |
+| **Showroom** | Opsi A: Places → fallback seed JSON | Runtime only; seed di `config/showrooms.seed.json` (bukan MongoDB) |
 | **Google Places** | **1x per session** (frontend Context + `sessionStorage`) | Backend stateless |
 | **Admin** | Skip | Sync via script; enrichment via JSON |
 | **Auth** | Google OAuth buyer only | JWT 24h |
@@ -86,8 +86,8 @@ MVP difokuskan pada **satu alur utama**: user masuk → dapat rekomendasi mobil 
                                          ▼
                                   ┌──────────────┐
                                   │   EXPIRED    │
-                                  │ plan → free  │
                                   │ AI blocked   │
+                                  │ tokens = 0   │
                                   └──────┬───────┘
                                          │
                               Subscribe lagi (Midtrans)
@@ -110,14 +110,14 @@ MVP difokuskan pada **satu alur utama**: user masuk → dapat rekomendasi mobil 
 |--------|--------|
 | **Jenis plan** | Hanya `premium_monthly` (MVP tidak ada yearly) |
 | **Durasi** | 30 hari sejak `startedAt` → `expiresAt = startedAt + 30 hari` |
-| **Saat bayar sukses** | `plan=premium`, `status=active`, AI unlimited, decrement token di-skip |
-| **Saat expired** | `plan=free`, `status=expired`, `aiTokensRemaining=0`, **AI diblok** |
+| **Saat bayar sukses** | Upsert `subscriptions`: `expiresAt = now + 30d`, `paymentStatus=success`; AI unlimited |
+| **Saat expired** | `expiresAt <= now` → `aiTokensRemaining=0`, **AI diblok** |
 | **Renewal** | **Manual** — user harus **subscribe lagi** via Midtrans; tidak ada auto-renew MVP |
 | **Setelah re-subscribe** | `expiresAt` diperpanjang +30 hari dari tanggal pembayaran baru |
 
 **Token consumption (free tier):** Setiap panggilan ke endpoint AI (rekomendasi, chatbot message, simulasi kredit AI) mengurangi 1 token.
 
-**Akses AI diizinkan jika:** `plan=premium` **DAN** `status=active` **DAN** `expiresAt > now` — jika tidak, perlakukan seperti free dengan token habis (`403 TOKEN_EXHAUSTED` / prompt upgrade).
+**Akses AI diizinkan jika:** `subscriptions.expiresAt > now` (premium aktif) **ATAU** (free tier) `aiTokensRemaining > 0`. Selain itu → `403 TOKEN_EXHAUSTED` / prompt upgrade.
 
 ---
 
@@ -189,7 +189,7 @@ MVP difokuskan pada **satu alur utama**: user masuk → dapat rekomendasi mobil 
 | CB-02 | Context-aware: tahu katalog mobil dari DB | P0 |
 | CB-03 | Setiap message user = -1 AI token (free tier) | P0 |
 | CB-04 | Block chat jika token habis + prompt upgrade | P0 |
-| CB-05 | Simpan riwayat sesi per user | P1 |
+| CB-05 | ~~Simpan riwayat sesi~~ | **Out** — chat stateless, tidak persist |
 
 **Contoh intent:** "Mobil apa cocok budget 300 juta keluarga 5 orang?"
 
@@ -233,13 +233,13 @@ MVP difokuskan pada **satu alur utama**: user masuk → dapat rekomendasi mobil 
 
 | ID | Requirement | Priority |
 |----|-------------|----------|
-| SU-01 | User baru: `plan=free`, `aiTokensRemaining=5` | P0 |
+| SU-01 | User baru: `aiTokensRemaining=5`, belum ada record `subscriptions` | P0 |
 | SU-02 | Decrement token on AI usage (free tier only) | P0 |
 | SU-03 | Halaman upgrade premium monthly + harga | P0 |
 | SU-04 | Midtrans Snap payment flow (`paymentType: premium_monthly`) | P0 |
-| SU-05 | Webhook Midtrans → aktifkan premium 30 hari (`startedAt`, `expiresAt`) | P0 |
-| SU-06 | Tampilkan badge plan + tanggal expired di profil | P1 |
-| SU-07 | Cron/job cek `expiresAt`: jika lewat → downgrade `plan=free`, `status=expired`, `aiTokensRemaining=0` | P0 |
+| SU-05 | Webhook Midtrans → upsert `subscriptions` (`startedAt`, `expiresAt`, `paymentStatus=success`) | P0 |
+| SU-06 | Tampilkan badge premium + tanggal `expiresAt` di profil | P1 |
+| SU-07 | Cron/job cek `expiresAt`: jika lewat → `aiTokensRemaining=0` | P0 |
 | SU-08 | Setelah expired, **blok semua endpoint AI** + prompt subscribe ulang | P0 |
 | SU-09 | Re-subscribe: pembayaran Midtrans baru → perpanjang premium +30 hari | P0 |
 
@@ -251,7 +251,7 @@ MVP difokuskan pada **satu alur utama**: user masuk → dapat rekomendasi mobil 
 |----|-------------|----------|
 | SH-01 | **Session init (frontend):** minta GPS 1x → panggil `GET /api/showrooms/nearby?lat=&lng=` **1x per session** | P0 |
 | SH-02 | Simpan hasil di **React Context** + `sessionStorage` (semua CTA showroom baca dari sini, tanpa API ulang) | P0 |
-| SH-03 | **Backend Opsi A:** coba Google Places → sukses return Places; gagal/kosong → fallback `showrooms` seed (`$near`) | P0 |
+| SH-03 | **Backend Opsi A:** coba Google Places → sukses return Places; gagal/kosong → fallback baca `config/showrooms.seed.json` (sort by distance) | P0 |
 | SH-04 | Response API sertakan `source: "google_places" \| "seed"` | P0 |
 | SH-05 | Tampilkan nama, alamat, jarak, link Google Maps | P0 |
 | SH-06 | GPS ditolak → default koordinat Jakarta → fetch nearby 1x | P1 |
@@ -262,10 +262,10 @@ MVP difokuskan pada **satu alur utama**: user masuk → dapat rekomendasi mobil 
 GET /api/showrooms/nearby?lat=&lng=
   1. Call Google Places API (car dealer, radius ~10 km)
   2. IF sukses && hasil tidak kosong → return { source: "google_places", data: [...] }
-  3. ELSE → query showrooms seed (geoLocation $near) → return { source: "seed", data: [...] }
+  3. ELSE → load config/showrooms.seed.json → sort by distance → return { source: "seed", data: [...] }
 ```
 
-**Seed showroom:** min. 3 record area Jakarta dengan `geoLocation` (2dsphere) sebagai fallback demo.
+**Seed showroom:** min. 3 entry di `config/showrooms.seed.json` (lat/lng Jakarta) sebagai fallback demo — **bukan collection MongoDB**.
 
 ---
 
@@ -368,7 +368,7 @@ npm run sync:cars
 ### Subscription
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/api/subscription/status` | Plan, tokens, `expiresAt`, days remaining |
+| GET | `/api/subscription/status` | `expiresAt`, tokens, days remaining |
 | POST | `/api/subscription/checkout` | Create Midtrans transaction (`premium_monthly` only) |
 | POST | `/api/subscription/webhook` | Midtrans callback → activate/extend premium |
 
@@ -414,10 +414,10 @@ flowchart TD
     B --> C[Midtrans Checkout]
     C --> D{Payment Success?}
     D -->|No| F[Toast Error]
-    D -->|Yes| E[Webhook: plan=premium, expiresAt=now+30d]
+    D -->|Yes| E[Webhook: subscriptions.expiresAt=now+30d]
     E --> G[Unlimited AI selama 30 hari]
     G --> H{expiresAt lewat?}
-    H -->|Ya| I[Downgrade: plan=free, AI blocked]
+    H -->|Ya| I[Expired: AI blocked, tokens=0]
     I --> J[User harus subscribe lagi]
     J --> B
     H -->|Belum| G
@@ -431,7 +431,7 @@ sequenceDiagram
     participant FE as Frontend
     participant BE as Backend
     participant GP as Google Places
-    participant DB as MongoDB
+    participant Seed as showrooms.seed.json
 
     U->>FE: Buka app / login
     FE->>U: Minta GPS (1x)
@@ -442,8 +442,8 @@ sequenceDiagram
         GP-->>BE: dealer list
         BE-->>FE: source=google_places
     else Places fail / empty
-        BE->>DB: showrooms seed $near
-        DB-->>BE: seed list
+        BE->>BE: load showrooms.seed.json
+        BE-->>BE: seed list sorted
         BE-->>FE: source=seed
     end
     FE->>FE: Simpan Context + sessionStorage
@@ -472,7 +472,7 @@ flowchart LR
 | **D3** | Detail produk + color swap | Wishlist API | AI recommend endpoint |
 | **D4** | Form rekomendasi UI + results | Showrooms Opsi A (Places + seed) | Chatbot LangChain |
 | **D5** | Chatbot UI + credit form | Subscription + Midtrans webhook | Credit AI simulation |
-| **D6** | Wishlist + auth flows | Expiry cron + seed showrooms | Integration testing |
+| **D6** | Wishlist + auth flows | Expiry cron + showrooms.seed.json | Integration testing |
 | **D7** | Polish UI + toast/swal | E2E sync + deploy | E2E test + deploy |
 
 ---
@@ -501,7 +501,7 @@ flowchart LR
 - [ ] Wishlist CRUD lengkap dengan toast & confirm delete
 - [ ] CarAPI sync + enrichment merge menghasilkan **5–10 mobil** di MongoDB
 - [ ] 1 Top Product + CI360 + colors[] dari enrichment
-- [ ] **3 showroom** seed (fallback Places)
+- [ ] **3 showroom** di `config/showrooms.seed.json` (fallback Places)
 - [ ] Showroom: Places 1x/session + fallback seed teruji
 - [ ] `npm run sync:cars` documented di README
 - [ ] README setup local + env variables documented
