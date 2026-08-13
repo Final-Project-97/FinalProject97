@@ -21,9 +21,11 @@ erDiagram
     USER ||--o{ CHAT_SESSION : has
     USER ||--o{ CREDIT_SIMULATION : creates
     USER ||--o{ AI_USAGE_LOG : consumes
+    USER ||--o{ RECOMMENDATION : generates
 
     CAR ||--o{ WISHLIST : "saved in"
     CAR ||--o{ CREDIT_SIMULATION : "simulated for"
+    CAR ||--o{ RECOMMENDATION : "referenced in results"
     CAR }o--|| USER : "created by admin"
 
     SHOWROOM ||--o{ CAR : "may stock"
@@ -166,6 +168,8 @@ erDiagram
     }
 ```
 
+> **Catatan `recommendations`:** Relasi ke `cars` tidak via FK root field, melainkan **`results[].carId`** (embedded reference). Relasi ke `wishlists` hanya di **alur bisnis** (user simpan mobil dari hasil rekomendasi dengan `source: 'recommendation'`), bukan foreign key langsung.
+
 ---
 
 ## 2. Relasi Antar Entitas
@@ -178,10 +182,20 @@ erDiagram
 | User → ChatSession | 1 : N | Riwayat sesi chatbot |
 | User → CreditSimulation | 1 : N | Histori simulasi kredit |
 | User → AiUsageLog | 1 : N | Audit penggunaan token AI |
+| User → Recommendation | 1 : N | Histori hasil AI rekomendasi (`userId` FK; nullable untuk guest trial) |
 | Car → Wishlist | 1 : N | Mobil bisa disimpan banyak user |
+| Car → Recommendation | 1 : N | Mobil direferensikan di `results[].carId` (embedded, bukan FK root) |
 | Car → User (admin) | N : 1 | Mobil dibuat oleh admin |
 | Subscription → Payment | 1 : N | Satu subscription bisa banyak payment (renewal) |
 | Showroom ↔ Car | N : M | Showroom menyimpan array `carTypes` atau `carIds` |
+
+### Relasi Alur Bisnis (bukan FK langsung)
+
+| Alur | Keterangan |
+|------|------------|
+| Recommendation → Wishlist | User menyimpan mobil dari output rekomendasi ke wishlist (`wishlists.source = 'recommendation'`) |
+| Recommendation → Showroom | Showroom terdekat di-resolve saat runtime dari `users.location` + Google Places, tidak disimpan di `recommendations` |
+| Recommendation ↔ AiUsageLog | Satu panggilan `POST /api/ai/recommend` menulis keduanya (log token + histori rekomendasi) |
 
 ---
 
@@ -481,6 +495,8 @@ erDiagram
 
 ### 3.10 `recommendations`
 
+Menyimpan input form dan output AI dari endpoint `POST /api/ai/recommend` (PRD §6.1 HP-03, HP-04).
+
 ```javascript
 {
   _id: ObjectId,
@@ -495,7 +511,7 @@ erDiagram
   },
   results: [
     {
-      carId: ObjectId,
+      carId: ObjectId,       // ref: cars (embedded, bukan FK root)
       carName: String,
       matchScore: Number,    // 0-100
       suggestedColors: [String],
@@ -507,6 +523,12 @@ erDiagram
 
 // Indexes
 // { userId: 1, createdAt: -1 }
+
+// Relasi
+// users        ← userId (1:N)
+// cars         ← results[].carId (1:N, embedded)
+// ai_usage_logs ← dibuat bersamaan saat AI recommend (proses, bukan FK)
+// wishlists    ← user bisa simpan mobil dari results via UI (source: 'recommendation')
 ```
 
 ---
@@ -555,11 +577,25 @@ erDiagram
 │chat_sessions │ ──────── userId ───────────► │    users     │
 │  messages[]  │ (EMBEDDED array)             │              │
 └──────────────┘                              └──────────────┘
+
+┌────────────────┐       userId (FK)          ┌──────────────┐
+│ recommendations│ ───────────────────────────► │    users     │
+│  formInput     │                              │              │
+│  results[]     │ ── results[].carId ────────► │    cars      │
+│    └── carId   │ (EMBEDDED ref)               │              │
+└────────────────┘                              └──────────────┘
+        │
+        │ alur bisnis (bukan FK)
+        ▼
+┌──────────────┐
+│  wishlists   │  source: 'recommendation'
+└──────────────┘
 ```
 
 **Keputusan desain:**
 - **Colors embedded di `cars`** — MVP: warna selalu tied to product, tidak perlu collection terpisah; swap image = lookup array by `name`.
 - **Messages embedded di `chat_sessions`** — conversation kecil, avoid join; cap 100 messages/session jika perlu.
+- **Results embedded di `recommendations`** — `carId` per item rekomendasi; tidak perlu collection junction terpisah.
 - **Subscription terpisah dari User** — memudahkan webhook Midtrans update tanpa touch user doc langsung (sync `users.plan` via hook).
 
 ---
@@ -613,6 +649,7 @@ sequenceDiagram
 | cars | 5 | 1 Top Product with 360 URL |
 | showrooms | 3 | With geoLocation Jakarta area |
 | subscriptions | 1 | Free tier for test buyer |
+| recommendations | 3 | Sample AI results linked to test buyer + cars |
 
 **Contoh car seed:**
 
