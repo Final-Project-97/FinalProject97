@@ -1,0 +1,945 @@
+{
+  "honda-brio-rs": {
+    "name": "Honda Brio RS CVT",
+    "brand": "Honda",
+    "type": "Hatchback",
+    "basePrice": 263200000,
+    "description": "City car sporty paling laris di Indonesia, irit, lincah, dan resale value tinggi.",
+    "specs": {
+      "engine": "1.2L i-VTEC",
+      "transmission": "CVT",
+      "fuelType": "Gasoline",
+      "seats": 5
+    },
+    "isTopProduct": true,
+    "thumbnailUrl": "https://asset.honda-indonesia.com/colors/vaC7VxycnfrqhaHL48dKeYXptkRZE1oaFAP1SKli.png",
+    "colors": [
+      {
+        "name": "Phoenix Orange Pearl Two Tone",
+        "hexCode": "#CC6633",
+        "imageUrl": "https://asset.honda-indonesia.com/colors/vaC7VxycnfrqhaHL48dKeYXptkRZE1oaFAP1SKli.png",
+        "availability": "available"
+      },
+      {
+        "name": "Electric Lime Metallic",
+        "hexCode": "#CBF418",
+        "imageUrl": "https://asset.honda-indonesia.com/colors/euqS00voL7Bf85GtPK8vkjFV1PzmzlGIMBKlOswi.png",
+        "availability": "available"
+      },
+      {
+        "name": "Stellar Diamond Pearl",
+        "hexCode": "#BBC8CD",
+        "imageUrl": "https://asset.honda-indonesia.com/colors/iah1dJwwvnafOFTmvHas68HJSFYYGZz7vZs7YzpK.png",
+        "availability": "available"
+      },
+      {
+        "name": "Meteoroid Gray Metallic",
+        "hexCode": "#828385",
+        "imageUrl": "https://asset.honda-indonesia.com/colors/Rpo6PzayZgX1ycKOM860d5OGLa4SlorgVvbiSQ3t.png",
+        "availability": "available"
+      },
+      {
+        "name": "Crystal Black Pearl",
+        "hexCode": "#383838",
+        "imageUrl": "https://asset.honda-indonesia.com/colors/H4SFMJltJu47ptl4YrqxZyQAI9gbY92GmIjqEMb4.png",
+        "availability": "available"
+      }
+    ],
+    "image360Url": "https://www.honda-indonesia.com/assets/3d/brio-color/index.html"
+  },
+  "honda-brio-satya": {
+    "name": "Honda Brio Satya S MT",
+    "brand": "Honda",
+    "type": "Hatchback",
+    "basePrice": 170400000,
+    "description": "Entry LCGC Honda dengan OTR Jakarta paling terjangkau dan biaya operasional rendah.",
+    "specs": {
+      "engine": "1.2L i-VTEC",
+      "transmission": "Manual",
+      "fuelType": "Gasoline",
+      "seats": 5
+    },
+    "isTopProduct": false,
+    "thumbnailUrl": "https://asset.honda-indonesia.com/colors/ydN9nwaQDsJkJvtiO4ZIvFhP3FCl3DVtd3MXTDjn.png",
+    "colors": [
+      {
+        "name": "Taffeta White",
+        "hexCode": "#EAEAEA",
+        "imageUrl": "https://asset.honda-indonesia.com/colors/ydN9nwaQDsJkJvtiO4ZIvFhP3FCl3DVtd3MXTDjn.png",
+        "availability": "available"
+      },
+      {
+        "name": "Rallye Red",
+        "hexCode": "#C20000",
+        "imageUrl": "https://asset.honda-indonesia.com/colors/xSCgIeKnWxukFd3MANUHxQVH3B0kJea9aZOHVQuh.png",
+        "availability": "available"
+      },
+      {
+        "name": "Meteoroid Gray Metallic",
+        "hexCode": "#828385",
+        "imageUrl": "https://asset.honda-indonesia.com/colors/Rpo6PzayZgX1ycKOM860d5OGLa4SlorgVvbiSQ3t.png",
+        "availability": "available"
+      },
+      {
+        "name": "Crystal Black Pearl",
+        "hexCode": "#383838",
+        "imageUrl": "https://asset.honda-indonesia.com/colors/H4SFMJltJu47ptl4YrqxZyQAI9gbY92GmIjqEMb4.png",
+        "availability": "available"
+      }
+    ]
+  },
+  "honda-wr-v": {
+    "name": "Honda WR-V 1.5L E CVT",
+    "brand": "Honda",
+    "type": "SUV",
+    "basePrice": 285100000,
+    "description": "Compact SUV Honda dengan ground clearance tinggi, cocok untuk keluarga urban.",
+    "specs": {
+      "engine": "1.5L DOHC i-VTEC",
+      "transmission": "CVT",
+      "fuelType": "Gasoline",
+      "seats": 5
+    },
+    "isTopProduct": false,
+    "thumbnailUrl": "https://asset.honda-indonesia.com/variants/images/r0VotH5xqhyQ6jxjBO4pRJQWBVTR0iNrPbgL8x26.png",
+    "colors": [
+      {
+        "name": "Platinum White Pearl",
+        "hexCode": "#F5F5F5",
+        "imageUrl": "https://asset.honda-indonesia.com/variants/images/r0VotH5xqhyQ6jxjBO4pRJQWBVTR0iNrPbgL8x26.png",
+        "availability": "available"
+      }
+    ]
+  },
+  "honda-wr-v-rs": {
+    "name": "Honda WR-V 1.5L RS",
+    "brand": "Honda",
+    "type": "SUV",
+    "basePrice": 298600000,
+    "description": "WR-V tipe RS dengan velg sport dan aksen hitam yang lebih agresif.",
+    "specs": {
+      "engine": "1.5L DOHC i-VTEC",
+      "transmission": "CVT",
+      "fuelType": "Gasoline",
+      "seats": 5
+    },
+    "isTopProduct": false,
+    "thumbnailUrl": "https://asset.honda-indonesia.com/variants/images/DkO4wfgxnHbEsTq3t7Fvpo8eX3nCXfOU79bzkmSf.png",
+    "colors": [
+      {
+        "name": "Crystal Black Pearl",
+        "hexCode": "#1A1A1A",
+        "imageUrl": "https://asset.honda-indonesia.com/variants/images/DkO4wfgxnHbEsTq3t7Fvpo8eX3nCXfOU79bzkmSf.png",
+        "availability": "available"
+      }
+    ]
+  },
+  "honda-wr-v-rs-sensing": {
+    "name": "Honda WR-V 1.5L RS Honda Sensing",
+    "brand": "Honda",
+    "type": "SUV",
+    "basePrice": 322100000,
+    "description": "WR-V RS lengkap dengan Honda SENSING untuk bantuan keselamatan aktif.",
+    "specs": {
+      "engine": "1.5L DOHC i-VTEC",
+      "transmission": "CVT",
+      "fuelType": "Gasoline",
+      "seats": 5
+    },
+    "isTopProduct": false,
+    "thumbnailUrl": "https://asset.honda-indonesia.com/variants/images/zoF7rGAmEsN9vaqlx3ZuUJTasbDtxVgILjKlTJY3.png",
+    "colors": [
+      {
+        "name": "Meteoroid Gray Metallic",
+        "hexCode": "#828385",
+        "imageUrl": "https://asset.honda-indonesia.com/variants/images/zoF7rGAmEsN9vaqlx3ZuUJTasbDtxVgILjKlTJY3.png",
+        "availability": "available"
+      }
+    ]
+  },
+  "honda-hr-v-e": {
+    "name": "Honda HR-V E CVT",
+    "brand": "Honda",
+    "type": "SUV",
+    "basePrice": 388600000,
+    "description": "Compact SUV coupe Honda dengan Honda SENSING dan desain futuristik.",
+    "specs": {
+      "engine": "1.5L DOHC i-VTEC",
+      "transmission": "CVT",
+      "fuelType": "Gasoline",
+      "seats": 5
+    },
+    "isTopProduct": false,
+    "thumbnailUrl": "https://asset.honda-indonesia.com/variants/images/jJNRU4RJ5z9sPPakMIedietSiX3lPp45hqrgI6TY.png",
+    "colors": [
+      {
+        "name": "Platinum White Pearl",
+        "hexCode": "#F4F4F2",
+        "imageUrl": "https://asset.honda-indonesia.com/variants/images/jJNRU4RJ5z9sPPakMIedietSiX3lPp45hqrgI6TY.png",
+        "availability": "available"
+      }
+    ]
+  },
+  "honda-hr-v-e-plus": {
+    "name": "Honda HR-V E+ CVT",
+    "brand": "Honda",
+    "type": "SUV",
+    "basePrice": 410700000,
+    "description": "HR-V E+ dengan velg 18 inci, audio 8 inci, dan Hands-Free Power Tailgate.",
+    "specs": {
+      "engine": "1.5L DOHC i-VTEC",
+      "transmission": "CVT",
+      "fuelType": "Gasoline",
+      "seats": 5
+    },
+    "isTopProduct": false,
+    "thumbnailUrl": "https://asset.honda-indonesia.com/variants/images/EwpB763kKUe3kFMYSvtHAUQc4G6FgQQwxarjDsMR.png",
+    "colors": [
+      {
+        "name": "Sand Khaki Pearl",
+        "hexCode": "#C3B091",
+        "imageUrl": "https://asset.honda-indonesia.com/variants/images/EwpB763kKUe3kFMYSvtHAUQc4G6FgQQwxarjDsMR.png",
+        "availability": "available"
+      }
+    ]
+  },
+  "honda-hr-v-ehev": {
+    "name": "Honda HR-V e:HEV",
+    "brand": "Honda",
+    "type": "SUV",
+    "basePrice": 450000000,
+    "description": "HR-V hybrid e:HEV, irit BBM dengan tenaga motor listrik yang responsif.",
+    "specs": {
+      "engine": "1.5L i-VTEC + e:HEV",
+      "transmission": "e-CVT",
+      "fuelType": "Hybrid",
+      "seats": 5
+    },
+    "isTopProduct": false,
+    "thumbnailUrl": "https://asset.honda-indonesia.com/variants/images/nl4FspMPONGbExUQMw1M5zU6Xp2LKIbssWrprBsz.png",
+    "colors": [
+      {
+        "name": "Meteoroid Gray Metallic",
+        "hexCode": "#828385",
+        "imageUrl": "https://asset.honda-indonesia.com/variants/images/nl4FspMPONGbExUQMw1M5zU6Xp2LKIbssWrprBsz.png",
+        "availability": "available"
+      }
+    ]
+  },
+  "honda-hr-v-rs-ehev": {
+    "name": "Honda HR-V RS e:HEV",
+    "brand": "Honda",
+    "type": "SUV",
+    "basePrice": 489000000,
+    "description": "Tipe tertinggi HR-V hybrid dengan aero kit RS dan panoramic glass roof.",
+    "specs": {
+      "engine": "1.5L i-VTEC + e:HEV",
+      "transmission": "e-CVT",
+      "fuelType": "Hybrid",
+      "seats": 5
+    },
+    "isTopProduct": false,
+    "thumbnailUrl": "https://asset.honda-indonesia.com/variants/images/0IB498ADYlsJPdP3eVb166LvEt3mLKkWgfbgiYuR.png",
+    "colors": [
+      {
+        "name": "Platinum White Pearl",
+        "hexCode": "#F4F4F2",
+        "imageUrl": "https://asset.honda-indonesia.com/variants/images/0IB498ADYlsJPdP3eVb166LvEt3mLKkWgfbgiYuR.png",
+        "availability": "available"
+      }
+    ]
+  },
+  "honda-br-v-n7x": {
+    "name": "Honda BR-V N7X E CVT",
+    "brand": "Honda",
+    "type": "SUV",
+    "basePrice": 330700000,
+    "description": "SUV 7-seater keluarga dengan kabin lapang dan ground clearance tinggi.",
+    "specs": {
+      "engine": "1.5L DOHC i-VTEC",
+      "transmission": "CVT",
+      "fuelType": "Gasoline",
+      "seats": 7
+    },
+    "isTopProduct": false,
+    "thumbnailUrl": "https://asset.honda-indonesia.com/variants/images/8dpf7edRrKIPgn7kmYkf1DwbVLgghM5SmBB7XwUc.png",
+    "colors": [
+      {
+        "name": "Platinum White Pearl",
+        "hexCode": "#F5F5F5",
+        "imageUrl": "https://asset.honda-indonesia.com/variants/images/8dpf7edRrKIPgn7kmYkf1DwbVLgghM5SmBB7XwUc.png",
+        "availability": "available"
+      }
+    ]
+  },
+  "honda-br-v-prestige": {
+    "name": "Honda BR-V N7X Prestige CVT",
+    "brand": "Honda",
+    "type": "SUV",
+    "basePrice": 356200000,
+    "description": "BR-V Prestige dengan kelengkapan fitur lebih lengkap untuk keluarga.",
+    "specs": {
+      "engine": "1.5L DOHC i-VTEC",
+      "transmission": "CVT",
+      "fuelType": "Gasoline",
+      "seats": 7
+    },
+    "isTopProduct": false,
+    "thumbnailUrl": "https://asset.honda-indonesia.com/variants/images/qyf7X2iRvnwPGM87VprgVihVgVXirRZL37gyimwd.png",
+    "colors": [
+      {
+        "name": "Modern Steel Metallic",
+        "hexCode": "#4A4A4A",
+        "imageUrl": "https://asset.honda-indonesia.com/variants/images/qyf7X2iRvnwPGM87VprgVihVgVXirRZL37gyimwd.png",
+        "availability": "available"
+      }
+    ]
+  },
+  "honda-cr-v-ehev": {
+    "name": "Honda CR-V 2.0L e:HEV",
+    "brand": "Honda",
+    "type": "SUV",
+    "basePrice": 777000000,
+    "description": "Flagship SUV hybrid Honda di Indonesia, kabin lapang dan irit untuk touring.",
+    "specs": {
+      "engine": "2.0L i-VTEC + e:HEV",
+      "transmission": "e-CVT",
+      "fuelType": "Hybrid",
+      "seats": 7
+    },
+    "isTopProduct": false,
+    "thumbnailUrl": "https://asset.honda-indonesia.com/variants/images/J2dbNCmzyAdjRU3sNsswvnaNqZnUbYNfOUZ9UOLI.png",
+    "colors": [
+      {
+        "name": "Obsidian Blue Pearl",
+        "hexCode": "#0A2540",
+        "imageUrl": "https://asset.honda-indonesia.com/variants/images/J2dbNCmzyAdjRU3sNsswvnaNqZnUbYNfOUZ9UOLI.png",
+        "availability": "available"
+      }
+    ]
+  },
+  "honda-cr-v-rs-ehev": {
+    "name": "Honda CR-V 2.0L RS e:HEV",
+    "brand": "Honda",
+    "type": "SUV",
+    "basePrice": 827800000,
+    "description": "CR-V RS e:HEV dengan paket sport RS dan fitur keselamatan terlengkap.",
+    "specs": {
+      "engine": "2.0L i-VTEC + e:HEV",
+      "transmission": "e-CVT",
+      "fuelType": "Hybrid",
+      "seats": 7
+    },
+    "isTopProduct": false,
+    "thumbnailUrl": "https://asset.honda-indonesia.com/variants/images/PFAWQRt7AIUuRyCpIDEZA82s5oYt6oDUeRKQ3h3J.png",
+    "colors": [
+      {
+        "name": "Platinum White Pearl",
+        "hexCode": "#F4F4F2",
+        "imageUrl": "https://asset.honda-indonesia.com/variants/images/PFAWQRt7AIUuRyCpIDEZA82s5oYt6oDUeRKQ3h3J.png",
+        "availability": "available"
+      }
+    ]
+  },
+  "honda-city-hatchback-rs": {
+    "name": "Honda City Hatchback RS CVT",
+    "brand": "Honda",
+    "type": "Hatchback",
+    "basePrice": 384500000,
+    "description": "Hatchback premium dengan Ultra Seat, kabin senyap, dan Honda SENSING.",
+    "specs": {
+      "engine": "1.5L DOHC i-VTEC",
+      "transmission": "CVT",
+      "fuelType": "Gasoline",
+      "seats": 5
+    },
+    "isTopProduct": false,
+    "thumbnailUrl": "https://asset.honda-indonesia.com/variants/images/MIWCuap6Q1J2Pxn0BkYzEkLnXjbAPlOGuKozYw4d.png",
+    "colors": [
+      {
+        "name": "Platinum White Pearl",
+        "hexCode": "#FFFFFF",
+        "imageUrl": "https://asset.honda-indonesia.com/colors/XUqQFzAoP5RnJaxQNpUGsEMYDVc0i3cTdudzrzFl.png",
+        "availability": "available"
+      },
+      {
+        "name": "Electric Lime Metallic Two Tone",
+        "hexCode": "#CBF418",
+        "imageUrl": "https://asset.honda-indonesia.com/colors/VbwnPjBwSpKRmThWHHFUzso1XbPRzLcJ4QdV4SWg.png",
+        "availability": "available"
+      },
+      {
+        "name": "Phoenix Orange Pearl Two Tone",
+        "hexCode": "#CC6633",
+        "imageUrl": "https://asset.honda-indonesia.com/colors/n9StEevzoedf0QNYS6do3da7x8VQ8Hw1gHj3t0xt.png",
+        "availability": "available"
+      },
+      {
+        "name": "Rallye Red",
+        "hexCode": "#C20000",
+        "imageUrl": "https://asset.honda-indonesia.com/colors/eSTuRT0oPipSa2OEvQgiEPyw99OSYBUD1GwdSLi5.png",
+        "availability": "available"
+      },
+      {
+        "name": "Meteoroid Gray Metallic",
+        "hexCode": "#828385",
+        "imageUrl": "https://asset.honda-indonesia.com/colors/hzi4xe8IKgjS6pzR1n6gkG1Qp7qnfiOPhWdyFyU0.png",
+        "availability": "available"
+      },
+      {
+        "name": "Crystal Black Pearl",
+        "hexCode": "#000000",
+        "imageUrl": "https://asset.honda-indonesia.com/colors/QZMcxTYyKicGULjC1oxJ66wYz3hWbBmr9zLIhB37.png",
+        "availability": "available"
+      }
+    ]
+  },
+  "honda-city": {
+    "name": "Honda City CVT",
+    "brand": "Honda",
+    "type": "Sedan",
+    "basePrice": 402000000,
+    "description": "Sedan kompak Honda dengan kabin lapang dan efisiensi bahan bakar baik.",
+    "specs": {
+      "engine": "1.5L DOHC i-VTEC",
+      "transmission": "CVT",
+      "fuelType": "Gasoline",
+      "seats": 5
+    },
+    "isTopProduct": false,
+    "thumbnailUrl": "https://asset.honda-indonesia.com/variants/images/zueuXgccVJfz3uTrQlDSIFAHHiXLtUu9ny339ZXu.png",
+    "colors": [
+      {
+        "name": "Platinum White Pearl",
+        "hexCode": "#EAEAEA",
+        "imageUrl": "https://asset.honda-indonesia.com/colors/Pvlcs6c0kRVpVQ0SkQOQlhb4ieC0w9tUDNqvvL6d.png",
+        "availability": "available"
+      },
+      {
+        "name": "Meteoroid Gray Metallic",
+        "hexCode": "#828385",
+        "imageUrl": "https://asset.honda-indonesia.com/colors/1rdpUSMVkhEncqxW4K5DyM8xHqfziGtAACcpd94c.png",
+        "availability": "available"
+      },
+      {
+        "name": "Crystal Black Pearl",
+        "hexCode": "#000000",
+        "imageUrl": "https://asset.honda-indonesia.com/colors/cyIAS9HpSCBQsCJ2cYm2JkbMoquxiGtnVWYgCc9H.png",
+        "availability": "available"
+      }
+    ]
+  },
+  "honda-accord-rs": {
+    "name": "Honda Accord 2.0L RS e:HEV",
+    "brand": "Honda",
+    "type": "Sedan",
+    "basePrice": 970900000,
+    "description": "Sedan eksekutif hybrid Honda dengan tenaga sistem 204 PS dan kabin mewah.",
+    "specs": {
+      "engine": "2.0L i-VTEC + e:HEV",
+      "transmission": "e-CVT",
+      "fuelType": "Hybrid",
+      "seats": 5
+    },
+    "isTopProduct": false,
+    "thumbnailUrl": "https://asset.honda-indonesia.com/variants/images/aql9arjJFDNkDYXNfEGqt6q174nJgpKYTCjqyWeM.png",
+    "colors": [
+      {
+        "name": "Platinum White Pearl",
+        "hexCode": "#D7D7D7",
+        "imageUrl": "https://asset.honda-indonesia.com/colors/SdH8KQTUfRk09YcQVgIiJCRqjqBLtfaZ9bU22LqK.png",
+        "availability": "available"
+      },
+      {
+        "name": "Ignite Red Metallic",
+        "hexCode": "#FF0000",
+        "imageUrl": "https://asset.honda-indonesia.com/colors/cKIx7J905HpZBaWk3ZsC1bA3tnXvEiay4D5Fv3Mn.png",
+        "availability": "available"
+      },
+      {
+        "name": "Crystal Black Pearl",
+        "hexCode": "#000000",
+        "imageUrl": "https://asset.honda-indonesia.com/colors/QWcd3ESQYPRi6KYRE2nLEa0t1HPek7NBor6lr3M5.png",
+        "availability": "available"
+      }
+    ]
+  },
+  "honda-civic-type-r": {
+    "name": "Honda Civic Type R 6MT",
+    "brand": "Honda",
+    "type": "Hatchback",
+    "basePrice": 1445500000,
+    "description": "Hot hatch ikonik Honda dengan transmisi manual 6 percepatan dan downforce tinggi.",
+    "specs": {
+      "engine": "2.0L VTEC Turbo",
+      "transmission": "Manual 6-speed",
+      "fuelType": "Gasoline",
+      "seats": 4
+    },
+    "isTopProduct": false,
+    "thumbnailUrl": "https://asset.honda-indonesia.com/variants/images/PQ5eDZbG4ve1ownP9pSZFJaJ9Fr5rXciXLd5uIu5.png",
+    "colors": [
+      {
+        "name": "Championship White",
+        "hexCode": "#FFFFFF",
+        "imageUrl": "https://asset.honda-indonesia.com/colors/JG3ZJQKOKf3mP1dXFfwfAK8tl11FYSpKQC8mp21x.png",
+        "availability": "available"
+      },
+      {
+        "name": "Rallye Red",
+        "hexCode": "#C20000",
+        "imageUrl": "https://asset.honda-indonesia.com/colors/6JQBcTZeOVZBfv7fVMeB3MlZlMbaIu8I5ue2EhFS.png",
+        "availability": "available"
+      },
+      {
+        "name": "Racing Blue Pearl",
+        "hexCode": "#0C5AC2",
+        "imageUrl": "https://asset.honda-indonesia.com/colors/ltltlhEvFcCVotLDGUBWPZKgfgBX8pVBp7s1Jp9A.png",
+        "availability": "available"
+      },
+      {
+        "name": "Sonic Gray Pearl",
+        "hexCode": "#697780",
+        "imageUrl": "https://asset.honda-indonesia.com/colors/pahSdcLd0MbUYUo3Nh4x2aWLaqNj8wPUYub9R20a.png",
+        "availability": "available"
+      },
+      {
+        "name": "Crystal Black Pearl",
+        "hexCode": "#000000",
+        "imageUrl": "https://asset.honda-indonesia.com/colors/5HK6VHhJ5YTL6jIPxwpKTvZh84zVyDxZsa4RDfd3.png",
+        "availability": "available"
+      }
+    ]
+  },
+  "honda-en1": {
+    "name": "Honda e:N1 EV",
+    "brand": "Honda",
+    "type": "SUV",
+    "basePrice": 859000000,
+    "description": "SUV listrik murni Honda berbasis e:N Architecture dengan jarak tempuh sekitar 500 km.",
+    "specs": {
+      "engine": "Electric Motor 201 hp / 68.8 kWh",
+      "transmission": "Automatic",
+      "fuelType": "Electric",
+      "seats": 5
+    },
+    "isTopProduct": false,
+    "thumbnailUrl": "https://asset.honda-indonesia.com/colors/bxL5yYp7WxahsmGBGmtaEsCBmbgdXrPXElkEutyI.png",
+    "colors": [
+      {
+        "name": "Obsidian Blue Pearl",
+        "hexCode": "#13488F",
+        "imageUrl": "https://asset.honda-indonesia.com/colors/bxL5yYp7WxahsmGBGmtaEsCBmbgdXrPXElkEutyI.png",
+        "availability": "available"
+      },
+      {
+        "name": "Platinum White Pearl",
+        "hexCode": "#EAEAE9",
+        "imageUrl": "https://asset.honda-indonesia.com/colors/HqwB9AapmWWc4Oh5ReiDJcju9aK7TpuxnDRACURD.png",
+        "availability": "available"
+      }
+    ]
+  },
+  "toyota-avanza": {
+    "name": "Toyota Avanza 1.5 G CVT",
+    "brand": "Toyota",
+    "type": "MPV",
+    "basePrice": 282100000,
+    "description": "MPV 7-seater sejuta umat dengan DNGA, irit, dan mudah dirawat di seluruh Indonesia.",
+    "specs": {
+      "engine": "1.5L 2NR-VE",
+      "transmission": "CVT",
+      "fuelType": "Gasoline",
+      "seats": 7
+    },
+    "isTopProduct": false,
+    "thumbnailUrl": "https://medias.auto2000.co.id/sys-master-hybrismedia/h66/h68/8831557468190/avanza-g-white_optimized.png",
+    "colors": [
+      {
+        "name": "White",
+        "hexCode": "#F5F5F5",
+        "imageUrl": "https://medias.auto2000.co.id/sys-master-hybrismedia/h66/h68/8831557468190/avanza-g-white_optimized.png",
+        "availability": "available"
+      },
+      {
+        "name": "Silver Metallic",
+        "hexCode": "#C0C4C8",
+        "imageUrl": "https://medias.auto2000.co.id/sys-master-hybrismedia/ha6/h64/8831557337118/avanza-g-silver_optimized.png",
+        "availability": "available"
+      },
+      {
+        "name": "Gray Metallic",
+        "hexCode": "#6B6E72",
+        "imageUrl": "https://medias.auto2000.co.id/sys-master-hybrismedia/hd8/h5a/8831557074974/avanza-g-gray_optimized.png",
+        "availability": "available"
+      },
+      {
+        "name": "Black",
+        "hexCode": "#1A1A1A",
+        "imageUrl": "https://medias.auto2000.co.id/sys-master-hybrismedia/h25/h6c/8831557599262/avanza-g-black_optimized.png",
+        "availability": "available"
+      },
+      {
+        "name": "Purplish Silver",
+        "hexCode": "#8A8494",
+        "imageUrl": "https://medias.auto2000.co.id/sys-master-hybrismedia/h47/h72/8831557730334/avanza-g-puplish_optimized.png",
+        "availability": "limited"
+      }
+    ]
+  },
+  "toyota-raize": {
+    "name": "Toyota Raize 1.0T G AT",
+    "brand": "Toyota",
+    "type": "SUV",
+    "basePrice": 277800000,
+    "description": "Compact SUV turbo 1.0L yang gesit di kota dengan opsi dua-tone sporty.",
+    "specs": {
+      "engine": "1.0L Turbo 1KR-VET",
+      "transmission": "Automatic",
+      "fuelType": "Gasoline",
+      "seats": 5
+    },
+    "isTopProduct": false,
+    "thumbnailUrl": "https://medias.auto2000.co.id/sys-master-hybrismedia/h19/h8d/8846828306462/raize_white%20(1).png",
+    "colors": [
+      {
+        "name": "White Two Tone",
+        "hexCode": "#F2F2F0",
+        "imageUrl": "https://medias.auto2000.co.id/sys-master-hybrismedia/h19/h8d/8846828306462/raize_white%20(1).png",
+        "availability": "available"
+      },
+      {
+        "name": "Black Metallic",
+        "hexCode": "#1C1C1C",
+        "imageUrl": "https://medias.auto2000.co.id/sys-master-hybrismedia/h03/h51/8824194269214/Raize%20Black_Colour%20View.png",
+        "availability": "available"
+      },
+      {
+        "name": "Gray Metallic",
+        "hexCode": "#7A7E82",
+        "imageUrl": "https://medias.auto2000.co.id/sys-master-hybrismedia/h54/h50/8824194203678/Raize%20Gray_Colour%20View.png",
+        "availability": "available"
+      },
+      {
+        "name": "Turmeric Yellow Two Tone",
+        "hexCode": "#E3B505",
+        "imageUrl": "https://medias.auto2000.co.id/sys-master-hybrismedia/h2c/h45/8824246468638/Yellow_cupblack_velgblack.png",
+        "availability": "limited"
+      },
+      {
+        "name": "Red Metallic Two Tone",
+        "hexCode": "#B71C1C",
+        "imageUrl": "https://medias.auto2000.co.id/sys-master-hybrismedia/h6c/h41/8824246337566/Red_cupblack_velgblack.png",
+        "availability": "available"
+      },
+      {
+        "name": "Blue Metallic Two Tone",
+        "hexCode": "#1E4E8C",
+        "imageUrl": "https://medias.auto2000.co.id/sys-master-hybrismedia/had/h3d/8824246206494/blue_cupblack_velgblack.png",
+        "availability": "available"
+      },
+      {
+        "name": "Silver Metallic Two Tone",
+        "hexCode": "#C5C9CD",
+        "imageUrl": "https://medias.auto2000.co.id/sys-master-hybrismedia/heb/h48/8824246599710/Silver_cupblack_velgblack.png",
+        "availability": "available"
+      }
+    ]
+  },
+  "toyota-rush": {
+    "name": "Toyota Rush 1.5 G AT",
+    "brand": "Toyota",
+    "type": "SUV",
+    "basePrice": 301100000,
+    "description": "SUV 7-seater tangguh dengan ground clearance tinggi untuk keluarga Indonesia.",
+    "specs": {
+      "engine": "1.5L 2NR-VE",
+      "transmission": "Automatic",
+      "fuelType": "Gasoline",
+      "seats": 7
+    },
+    "isTopProduct": false,
+    "thumbnailUrl": "https://medias.auto2000.co.id/sys-master-hybrismedia/h9f/h50/8873481502750/colour-view-white_optimized.png",
+    "colors": [
+      {
+        "name": "White",
+        "hexCode": "#F5F5F5",
+        "imageUrl": "https://medias.auto2000.co.id/sys-master-hybrismedia/h9f/h50/8873481502750/colour-view-white_optimized.png",
+        "availability": "available"
+      }
+    ]
+  },
+  "toyota-calya": {
+    "name": "Toyota Calya 1.2 G AT",
+    "brand": "Toyota",
+    "type": "MPV",
+    "basePrice": 193200000,
+    "description": "LCGC 7-seater paling hemat untuk keluarga dengan kebutuhan kabin maksimal.",
+    "specs": {
+      "engine": "1.2L 3NR-VE",
+      "transmission": "Automatic",
+      "fuelType": "Gasoline",
+      "seats": 7
+    },
+    "isTopProduct": false,
+    "thumbnailUrl": "https://medias.auto2000.co.id/sys-master-hybrismedia/h6b/hf2/8846609547294/919_484_New-calya-2022-GrayMet%20(1).png",
+    "colors": [
+      {
+        "name": "Black Metallic",
+        "hexCode": "#1A1A1A",
+        "imageUrl": "https://medias.auto2000.co.id/sys-master-hybrismedia/h6b/hf2/8846609547294/919_484_New-calya-2022-GrayMet%20(1).png",
+        "availability": "available"
+      }
+    ]
+  },
+  "toyota-agya": {
+    "name": "Toyota Agya 1.2 G CVT",
+    "brand": "Toyota",
+    "type": "Hatchback",
+    "basePrice": 198200000,
+    "description": "City car LCGC Toyota yang lincah, irit, dan mudah diparkir di perkotaan.",
+    "specs": {
+      "engine": "1.2L 3NR-VE",
+      "transmission": "CVT",
+      "fuelType": "Gasoline",
+      "seats": 5
+    },
+    "isTopProduct": false,
+    "thumbnailUrl": "https://medias.auto2000.co.id/sys-master-hybrismedia/h4c/hd6/8845331824670/agya_gray_optimized.png",
+    "colors": [
+      {
+        "name": "Silver Metallic",
+        "hexCode": "#C0C4C8",
+        "imageUrl": "https://medias.auto2000.co.id/sys-master-hybrismedia/h4c/hd6/8845331824670/agya_gray_optimized.png",
+        "availability": "available"
+      }
+    ]
+  },
+  "toyota-innova-zenix": {
+    "name": "Toyota Kijang Innova Zenix 2.0 G CVT",
+    "brand": "Toyota",
+    "type": "MPV",
+    "basePrice": 437700000,
+    "description": "Generasi baru Kijang Innova bensin di platform TNGA dengan kabin lebih modern.",
+    "specs": {
+      "engine": "2.0L M20A-FKS",
+      "transmission": "CVT",
+      "fuelType": "Gasoline",
+      "seats": 7
+    },
+    "isTopProduct": false,
+    "thumbnailUrl": "https://medias.auto2000.co.id/sys-master-hybrismedia/ha0/h8b/8843010408478/Thumbnail_Silver-metalicq2re.png",
+    "colors": [
+      {
+        "name": "Silver Metallic",
+        "hexCode": "#C2C6C9",
+        "imageUrl": "https://medias.auto2000.co.id/sys-master-hybrismedia/ha0/h8b/8843010408478/Thumbnail_Silver-metalicq2re.png",
+        "availability": "available"
+      },
+      {
+        "name": "Platinum White Pearl",
+        "hexCode": "#F4F4F2",
+        "imageUrl": "https://medias.auto2000.co.id/sys-master-hybrismedia/h0a/h87/8846828175390/Thumbnail_white-pearl-zenix.png",
+        "availability": "available"
+      }
+    ]
+  },
+  "toyota-innova-zenix-hybrid": {
+    "name": "Toyota Kijang Innova Zenix Q Hybrid",
+    "brand": "Toyota",
+    "type": "MPV",
+    "basePrice": 624900000,
+    "description": "Innova Zenix hybrid tipe Q TSS, senyap, irit, dan dilengkapi Toyota Safety Sense.",
+    "specs": {
+      "engine": "2.0L Hybrid M20A-FXS",
+      "transmission": "e-CVT",
+      "fuelType": "Hybrid",
+      "seats": 7
+    },
+    "isTopProduct": false,
+    "thumbnailUrl": "https://medias.auto2000.co.id/sys-master-hybrismedia/h0a/h87/8846828175390/Thumbnail_white-pearl-zenix.png",
+    "colors": [
+      {
+        "name": "Platinum White Pearl",
+        "hexCode": "#F4F4F2",
+        "imageUrl": "https://medias.auto2000.co.id/sys-master-hybrismedia/h0a/h87/8846828175390/Thumbnail_white-pearl-zenix.png",
+        "availability": "available"
+      },
+      {
+        "name": "Silver Metallic",
+        "hexCode": "#C2C6C9",
+        "imageUrl": "https://medias.auto2000.co.id/sys-master-hybrismedia/ha0/h8b/8843010408478/Thumbnail_Silver-metalicq2re.png",
+        "availability": "available"
+      }
+    ]
+  },
+  "toyota-yaris-cross": {
+    "name": "Toyota Yaris Cross 1.5 G CVT",
+    "brand": "Toyota",
+    "type": "SUV",
+    "basePrice": 372900000,
+    "description": "Urban SUV Toyota dengan ground clearance tinggi dan opsi hybrid di tipe atas.",
+    "specs": {
+      "engine": "1.5L 2NR-VE",
+      "transmission": "CVT",
+      "fuelType": "Gasoline",
+      "seats": 5
+    },
+    "isTopProduct": false,
+    "thumbnailUrl": "https://medias.auto2000.co.id/sys-master-hybrismedia/h56/h23/8847208153118/4-super-white-ii_optimized.png",
+    "colors": [
+      {
+        "name": "Super White II",
+        "hexCode": "#F7F7F5",
+        "imageUrl": "https://medias.auto2000.co.id/sys-master-hybrismedia/h56/h23/8847208153118/4-super-white-ii_optimized.png",
+        "availability": "available"
+      },
+      {
+        "name": "Silver Metallic",
+        "hexCode": "#C5C9CD",
+        "imageUrl": "https://medias.auto2000.co.id/sys-master-hybrismedia/hd6/ha3/8847336210462/3-silver-metallic_0_optimized.png",
+        "availability": "available"
+      },
+      {
+        "name": "Attitude Black Mica",
+        "hexCode": "#1A1A1A",
+        "imageUrl": "https://medias.auto2000.co.id/sys-master-hybrismedia/h5d/h9d/8847336046622/6-attitude-black-mica_1_optimized.png",
+        "availability": "available"
+      },
+      {
+        "name": "Greenish Gunmetal",
+        "hexCode": "#4A5C54",
+        "imageUrl": "https://medias.auto2000.co.id/sys-master-hybrismedia/hde/h9a/8847213101086/5-greenish-gunmetal-m_optimized.m_.png",
+        "availability": "available"
+      }
+    ]
+  },
+  "toyota-yaris": {
+    "name": "Toyota Yaris 1.5 S CVT GR Sport",
+    "brand": "Toyota",
+    "type": "Hatchback",
+    "basePrice": 347400000,
+    "description": "Hatchback sporty GR Sport, lincah di kota dengan handling yang presisi.",
+    "specs": {
+      "engine": "1.5L 2NR-FE",
+      "transmission": "CVT",
+      "fuelType": "Gasoline",
+      "seats": 5
+    },
+    "isTopProduct": false,
+    "thumbnailUrl": "https://medias.auto2000.co.id/sys-master-hybrismedia/ha2/h01/8826526892062/gr_0023_6-super-white_optimized.png",
+    "colors": [
+      {
+        "name": "Super White",
+        "hexCode": "#F7F7F5",
+        "imageUrl": "https://medias.auto2000.co.id/sys-master-hybrismedia/ha2/h01/8826526892062/gr_0023_6-super-white_optimized.png",
+        "availability": "available"
+      },
+      {
+        "name": "Black / Super White II Two Tone",
+        "hexCode": "#1A1A1A",
+        "imageUrl": "https://medias.auto2000.co.id/sys-master-hybrismedia/h05/h86/8846786625566/4-black-%2B-super-white-ii_optimized.png",
+        "availability": "limited"
+      }
+    ]
+  },
+  "toyota-veloz": {
+    "name": "Toyota Veloz 1.5 Q CVT",
+    "brand": "Toyota",
+    "type": "MPV",
+    "basePrice": 322400000,
+    "description": "MPV 7-seater premium di atas Avanza, dengan desain lebih gagah dan fitur lebih lengkap.",
+    "specs": {
+      "engine": "1.5L 2NR-VE",
+      "transmission": "CVT",
+      "fuelType": "Gasoline",
+      "seats": 7
+    },
+    "isTopProduct": false,
+    "thumbnailUrl": "https://medias.auto2000.co.id/sys-master-hybrismedia/hf1/h0b/8942100414494/veloz-silver-metalic-black_thumbnail_optimized.png",
+    "colors": [
+      {
+        "name": "Silver Metallic / Black Two Tone",
+        "hexCode": "#C5C9CD",
+        "imageUrl": "https://medias.auto2000.co.id/sys-master-hybrismedia/hf1/h0b/8942100414494/veloz-silver-metalic-black_thumbnail_optimized.png",
+        "availability": "available"
+      }
+    ]
+  },
+  "toyota-voxy": {
+    "name": "Toyota Voxy 2.0 CVT",
+    "brand": "Toyota",
+    "type": "MPV",
+    "basePrice": 632700000,
+    "description": "MPV kapten seat dengan pintu geser, kabin kapten, dan nuansa premium keluarga.",
+    "specs": {
+      "engine": "2.0L M20A-FKS",
+      "transmission": "CVT",
+      "fuelType": "Gasoline",
+      "seats": 7
+    },
+    "isTopProduct": false,
+    "thumbnailUrl": "https://medias.auto2000.co.id/sys-master-hybrismedia/h0c/hbb/8833709146142/allnewvoxy_blackpearl_optimized.png",
+    "colors": [
+      {
+        "name": "Black Pearl",
+        "hexCode": "#1A1A1A",
+        "imageUrl": "https://medias.auto2000.co.id/sys-master-hybrismedia/h0c/hbb/8833709146142/allnewvoxy_blackpearl_optimized.png",
+        "availability": "available"
+      }
+    ]
+  },
+  "toyota-gr86": {
+    "name": "Toyota GR86 2.4 Manual",
+    "brand": "Toyota",
+    "type": "Sedan",
+    "basePrice": 1052000000,
+    "description": "Sport coupe RWD Gazoo Racing dengan mesin boxer 2.4L dan handling khas GR.",
+    "specs": {
+      "engine": "2.4L Boxer FA24",
+      "transmission": "Manual",
+      "fuelType": "Gasoline",
+      "seats": 4
+    },
+    "isTopProduct": false,
+    "thumbnailUrl": "https://medias.auto2000.co.id/sys-master-hybrismedia/h9d/h4a/8888884723742/1%20Crystal%20White%20Pearl.png",
+    "colors": [
+      {
+        "name": "Crystal White Pearl",
+        "hexCode": "#F4F4F2",
+        "imageUrl": "https://medias.auto2000.co.id/sys-master-hybrismedia/h9d/h4a/8888884723742/1%20Crystal%20White%20Pearl.png",
+        "availability": "available"
+      },
+      {
+        "name": "Ignition Red",
+        "hexCode": "#C41E3A",
+        "imageUrl": "https://medias.auto2000.co.id/sys-master-hybrismedia/h73/he1/8888886755358/2%20Ignition%20Red.png",
+        "availability": "limited"
+      },
+      {
+        "name": "Crystal Black Silica",
+        "hexCode": "#0D0D0D",
+        "imageUrl": "https://medias.auto2000.co.id/sys-master-hybrismedia/h3b/h18/8888883937310/3%20Crystal%20Black%20Silica.png",
+        "availability": "available"
+      },
+      {
+        "name": "Ice Silver Metallic",
+        "hexCode": "#C8CCD0",
+        "imageUrl": "https://medias.auto2000.co.id/sys-master-hybrismedia/hcd/h43/8888884527134/5%20Ice%20Silver%20Metallic.png",
+        "availability": "available"
+      },
+      {
+        "name": "Magnetite Gray Metallic",
+        "hexCode": "#4A4E52",
+        "imageUrl": "https://medias.auto2000.co.id/sys-master-hybrismedia/h1b/h52/8888884985886/6%20Magnetite%20Gray%20Metallic.png",
+        "availability": "available"
+      },
+      {
+        "name": "Sapphire Blue Pearl",
+        "hexCode": "#1B3A6B",
+        "imageUrl": "https://medias.auto2000.co.id/sys-master-hybrismedia/ha3/hda/8888886951966/7%20Sapphire%20Blue%20Pearl.png",
+        "availability": "available"
+      }
+    ]
+  }
+}
