@@ -4,6 +4,7 @@ import { User } from '../models/index.js';
 import { registerSchema, loginSchema, googleSchema } from './validation.js';
 import { signToken } from './jwt.js';
 import { toPublicUser } from './sanitize.js';
+import { Subscription } from '../models/index.js';
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -128,4 +129,30 @@ export async function google(req, res) {
 
 export async function logout(_req, res) {
   return res.status(200).json({ success: true, message: 'Logout di client: hapus token' });
+}
+
+export async function me(req, res) {
+  try {
+    const sub = await Subscription.where('userId', String(req.user._id)).first();
+    const now = Date.now();
+    const expiresAt = sub?.expiresAt ? new Date(sub.expiresAt) : null;
+    const premiumActive = expiresAt && expiresAt.getTime() > now;
+    const daysRemaining = premiumActive
+      ? Math.ceil((expiresAt.getTime() - now) / (1000 * 60 * 60 * 24))
+      : 0;
+
+    return res.status(200).json({
+      success: true,
+      user: req.user, // sudah tanpa passwordHash
+      aiTokensRemaining: req.user.aiTokensRemaining,
+      subscription: {
+        expiresAt: expiresAt || null,
+        daysRemaining,
+        paymentStatus: sub?.paymentStatus || null,
+      },
+    });
+  } catch (err) {
+    console.error('[auth/me]', err);
+    return res.status(500).json({ success: false, message: 'Kesalahan internal server' });
+  }
 }
