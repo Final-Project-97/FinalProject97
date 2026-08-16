@@ -28,10 +28,6 @@ class User extends BaseModel {
       address: String,
     },
   };
-  constructor() {
-    super();
-    this.$hidden = ['passwordHash'];
-  }
 }
 
 export default User;
