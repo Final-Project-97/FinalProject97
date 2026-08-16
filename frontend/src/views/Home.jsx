@@ -1,7 +1,7 @@
-import FloatAI from "../components/FloatAI";
-import Hero from "../components/Hero";
-import Product360 from "../components/Product360";
-import Stats from "../components/Stasts";
+import FloatAI from "../components/home/FloatAI";
+import Hero from "../components/home/Hero";
+import Product360 from "../components/home/Product360";
+import Stats from "../components/home/Stasts";
 
 export default function Home() {
   return (

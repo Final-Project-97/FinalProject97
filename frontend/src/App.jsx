@@ -12,8 +12,8 @@ function App() {
           
           <Route element={<BaseLayout />}>
             <Route path="/" element={<Home />} />
-            {/* aku bingung routenya :v */}
             {/* <Route path="/car/:id" element={<CarDetail />} /> */}
+            {/* aku bingung routenya :v */}
             {/* <Route path="/credit" element={<Credit />} /> */}
             {/* <Route path="/profile" element={<Profile />} /> */}
           </Route>
