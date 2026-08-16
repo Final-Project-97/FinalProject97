@@ -14,6 +14,24 @@ import BaseModel from './BaseModel.js';
  */
 class User extends BaseModel {
   // auto collection: "users"
+  static $schema = {
+    email: String,
+    passwordHash: String,
+    googleId: String,
+    name: String,
+    avatarUrl: String,
+    role: { type: String, default: 'buyer' },
+    aiTokensRemaining: { type: Number, default: 5 },
+    location: {
+      lat: Number,
+      lng: Number,
+      address: String,
+    },
+  };
+  constructor() {
+    super();
+    this.$hidden = ['passwordHash'];
+  }
 }
 
 export default User;

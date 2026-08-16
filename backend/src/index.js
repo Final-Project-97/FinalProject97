@@ -4,7 +4,7 @@ import cors from "cors";
 import { connectDB } from "./database.js";
 import { carRoutes } from "./routes/car.routes.js";
 import { aiRoutes } from "./routes/ai.routes.js";
-
+import { authRoutes } from "./auth/routes.js";
 dotenv.config();
 
 const app = express();
@@ -17,6 +17,8 @@ app.use(cors());
 // Registrasi Rute API
 app.use("/api/cars", carRoutes);
 app.use("/api/ai", aiRoutes);
+app.use("/api/auth", authRoutes);
+
 
 // Endpoint Health Check
 app.get("/health", (req, res) => {
