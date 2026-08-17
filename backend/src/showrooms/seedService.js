@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { sortByDistance } from './distance.util.js';
+import { sortByDistance } from './distance.utils.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SEED_PATH = path.join(__dirname, '../../config/showrooms.seed.json');

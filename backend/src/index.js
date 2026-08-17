@@ -5,7 +5,10 @@ import { connectDB } from "./database.js";
 import { carRoutes } from "./routes/car.routes.js";
 import { aiRoutes } from "./routes/ai.routes.js";
 import { authRoutes } from "./auth/routes.js";
+import { showroomRoutes } from "./showrooms/routes.js";
 import { wishlistRoutes } from "./wishlist/routes.js";
+import { subscriptionRoutes } from "./subscription/routes.js";
+
 dotenv.config();
 
 const app = express();
@@ -20,6 +23,8 @@ app.use("/api/cars", carRoutes);
 app.use("/api/ai", aiRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/wishlist", wishlistRoutes);
+app.use("/api/showrooms", showroomRoutes);
+app.use("/api/subscription", subscriptionRoutes);
 
 
 
