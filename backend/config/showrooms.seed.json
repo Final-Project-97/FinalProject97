@@ -1,0 +1,32 @@
+[
+  {
+    "name": "Toyota Astra Sudirman",
+    "address": "Jl. Jenderal Sudirman No. 86, Jakarta Pusat",
+    "lat": -6.2088,
+    "lng": 106.8456
+  },
+  {
+    "name": "Honda Istana Kemang",
+    "address": "Jl. Kemang Raya No. 32, Jakarta Selatan",
+    "lat": -6.2615,
+    "lng": 106.8106
+  },
+  {
+    "name": "Mitsubishi Dipo Motor",
+    "address": "Jl. MT Haryono Kav. 15, Jakarta Timur",
+    "lat": -6.2383,
+    "lng": 106.8756
+  },
+  {
+    "name": "Auto2000 Tebet",
+    "address": "Jl. Prof. Dr. Soepomo No. 45, Jakarta Selatan",
+    "lat": -6.2301,
+    "lng": 106.8512
+  },
+  {
+    "name": "Wuling Motors Jakarta",
+    "address": "Jl. Gatot Subroto, Jakarta Selatan",
+    "lat": -6.2297,
+    "lng": 106.8294
+  }
+]
