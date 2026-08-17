@@ -1,5 +1,4 @@
-import { User } from "../models/user.model.js";
-import { Subscription } from "../models/subscription.model.js";
+import { User, Subscription } from '../models/index.js'
 
 /**
  * Middleware untuk memvalidasi hak akses dan kuota token AI pengguna via Mongoloquent.
@@ -50,7 +49,7 @@ export const aiGateMiddleware = async (req, res, next) => {
     }
 
     // 5. Skenario B: Pengguna adalah FREE TIER -> Periksa sisa token
-    const currentTokens = user.aiTokensRemaining ?? 5; // Default 5 jika belum diinisialisasi
+    const currentTokens = user.aiTokensRemaining ?? 0;
 
     if (currentTokens > 0) {
       const updatedTokens = currentTokens - 1;
@@ -69,6 +68,7 @@ export const aiGateMiddleware = async (req, res, next) => {
     // 6. Skenario C: Token Habis & Tidak Langganan -> Blokir akses
     return res.status(403).json({
       success: false,
+      code: "TOKEN_EXHAUSTED",
       error: "TOKEN_EXHAUSTED",
       message:
         "Kuota token AI gratis Anda sudah habis. Silakan lakukan upgrade ke akun Premium untuk akses tanpa batas.",

@@ -1,8 +1,9 @@
 import { ChatGroq } from "@langchain/groq";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
-import { Car } from "../models/car.model.js";
+import Car from "../models/car.model.js";
 import { getDB } from "../database.js";
 import { ObjectId } from "mongodb";
+import { calculateCreditSimulation } from "../helpers/credit.helper.js"
 
 export const handleAIChat = async (req, res) => {
   try {
@@ -35,13 +36,13 @@ export const handleAIChat = async (req, res) => {
     // Prompt RAG dengan instruksi khusus
     const systemInstruction = new SystemMessage(
       `Kamu adalah asisten virtual cerdas untuk platform "RAC AI (Recommendation Auto Car)".\n` +
-        `Tugasmu adalah menjawab pertanyaan pengguna secara ramah, profesional, dan akurat berdasarkan HANYA pada data katalog mobil berikut:\n\n` +
-        `${catalogSummary || "Katalog belum tersedia."}\n\n` +
-        `Aturan Ketat:\n` +
-        `1. Jangan pernah merekayasa atau menebak harga dan spesifikasi di luar daftar data di atas.\n` +
-        `2. Jika mobil yang ditanyakan tidak ada dalam daftar, katakan dengan sopan bahwa mobil tersebut tidak tersedia dalam katalog.\n` +
-        `3. Berikan jawaban dalam bahasa Indonesia yang natural dan lugas.\n` +
-        `4. Jika pertanyaan bukan terkait mobil atau bukan terkait RAC AI (Recommendation Auto Car) maka posisikan kamu sebagai asisten virtual paling cerdas dan berpengetahuan luas. Sebagai contoh jika pertanyaan "5 + 5 berapa ?" atau "siapa presiden ke 5 ?" maka pesan awal harus: "Saya diciptakan sebagai asisten virtual cerdas untuk platform RAC AI (Recommendation Auto Car), tapi bukan berarti saya tidak bisa menjawab pertanyaan kamu. Jawaban dari pertanyaan kamu adalah: "`,
+      `Tugasmu adalah menjawab pertanyaan pengguna secara ramah, profesional, dan akurat berdasarkan HANYA pada data katalog mobil berikut:\n\n` +
+      `${catalogSummary || "Katalog belum tersedia."}\n\n` +
+      `Aturan Ketat:\n` +
+      `1. Jangan pernah merekayasa atau menebak harga dan spesifikasi di luar daftar data di atas.\n` +
+      `2. Jika mobil yang ditanyakan tidak ada dalam daftar, katakan dengan sopan bahwa mobil tersebut tidak tersedia dalam katalog.\n` +
+      `3. Berikan jawaban dalam bahasa Indonesia yang natural dan lugas.\n` +
+      `4. Jika pertanyaan bukan terkait mobil atau bukan terkait RAC AI (Recommendation Auto Car) maka posisikan kamu sebagai asisten virtual paling cerdas dan berpengetahuan luas. Sebagai contoh jika pertanyaan "5 + 5 berapa ?" atau "siapa presiden ke 5 ?" maka pesan awal harus: "Saya diciptakan sebagai asisten virtual cerdas untuk platform RAC AI (Recommendation Auto Car), tapi bukan berarti saya tidak bisa menjawab pertanyaan kamu. Jawaban dari pertanyaan kamu adalah: "`,
     );
 
     const userQuery = new HumanMessage(message);
@@ -98,13 +99,13 @@ export const handleAIChat = async (req, res) => {
 export const handleAIRecommend = async (req, res) => {
   try {
     // Ekstraksi parameter form yang diperkaya dengan konteks medan dan tujuan penggunaan
-    const { budget, type, seats, priority, terrain, usagePurpose } = req.body;
+    const { budgetMin, budgetMax, needType, passengers, priority, selectedColor } = req.body;
     const userId = req.user?.id || req.user?._id;
 
-    if (!budget) {
+    if (!budgetMin || !budgetMax) {
       return res.status(400).json({
         success: false,
-        message: "Parameter budget wajib diisi untuk melakukan rekomendasi.",
+        message: "Parameter budgetMin dan budgetMax wajib diisi untuk melakukan rekomendasi.",
       });
     }
 
@@ -133,23 +134,26 @@ export const handleAIRecommend = async (req, res) => {
       temperature: 0.2,
     });
 
+    const budgetLabel = `Rp ${Number(budgetMin).toLocaleString("id-ID")} - Rp ${Number(budgetMax).toLocaleString("id-ID")}`;
+    const seatsLabel = passengers ? `${passengers} penumpang` : "Bebas";
+    const needLabel = needType || "Mobilitas harian";
+    const priorityLabel = priority || "Kenyamanan dan efisiensi";
+    const colorLabel = selectedColor || "Bebas";
+
     // Prompt yang diperkuat dengan parameter analitik mendalam
     const systemPrompt = new SystemMessage(
-      `Kamu adalah seorang pakar konsultan otomotif profesional untuk platform "RAC AI".\n` +
-        `Pengguna mencari rekomendasi mobil berdasarkan kriteria terperinci berikut:\n` +
-        `- Maksimal Budget: Rp ${Number(budget).toLocaleString("id-ID")}\n` +
-        `- Preferensi Tipe Bodi: ${type || "Bebas"}\n` +
-        `- Minimal Kapasitas Penumpang: ${seats || "Bebas"} kursi\n` +
-        `- Prioritas Utama: ${priority || "Kenyamanan dan Efisiensi"}\n` +
-        `- Medan Perjalanan Dominan: ${terrain || "Perkotaan umum (City driving)"}\n` +
-        `- Tujuan Penggunaan Utama: ${usagePurpose || "Mobilitas harian"}\n\n` +
-        `Daftar Katalog Mobil yang Tersedia di Database:\n` +
-        `${catalogDetails}\n\n` +
-        `Instruksi Analisis & Output:\n` +
-        `Analisis kesesuaian spesifikasi mesin, ground clearance, dan efisiensi transmisi terhadap medan perjalanan (${terrain}) dan tujuan pengguna (${usagePurpose}). ` +
-        `Pilih 1 hingga 3 mobil dari katalog di atas yang paling rasional. ` +
-        `Berikan output dalam format JSON murni berstruktur array tanpa teks tambahan di luar JSON, dengan format:\n` +
-        `[\n  {\n    "carId": "id_dari_katalog",\n    "matchScore": 95,\n    "aiReason": "Alasan mendalam dikaitkan dengan medan jalan dan kebutuhan pengguna..."\n  }\n]`,
+      `Kamu adalah pakar konsultan otomotif untuk platform "RAC AI".\n` +
+      `Pengguna mencari rekomendasi mobil dengan kriteria:\n` +
+      `- Range Budget: ${budgetLabel}\n` +
+      `- Kebutuhan: ${needLabel}\n` +
+      `- Jumlah penumpang: ${seatsLabel}\n` +
+      `- Prioritas: ${priorityLabel}\n` +
+      `- Preferensi warna: ${colorLabel}\n\n` +
+      `Daftar Katalog Mobil (status active):\n` +
+      `${catalogDetails}\n\n` +
+      `Pilih 1–3 mobil dari katalog di atas yang paling sesuai budget dan kebutuhan.\n` +
+      `Output JSON murni array saja, format:\n` +
+      `[\n  {\n    "carId": "id_dari_katalog",\n    "matchScore": 95,\n    "aiReason": "Alasan singkat...",\n    "selectedColor": "${colorLabel !== "Bebas" ? colorLabel : "opsional"}"\n  }\n]`,
     );
 
     const userRequest = new HumanMessage(
@@ -190,7 +194,7 @@ export const handleAIRecommend = async (req, res) => {
           feature: "recommend",
           tokensUsed: 1,
           metadata: {
-            criteria: { budget, type, seats, priority, terrain, usagePurpose },
+            criteria: { budgetMin, budgetMax, needType, passengers, priority, selectedColor },
             recommendedCount: Array.isArray(parsedRecommendations)
               ? parsedRecommendations.length
               : 1,
@@ -270,14 +274,14 @@ export const handleCreditSimulation = async (req, res) => {
 
     const systemPrompt = new SystemMessage(
       `Kamu adalah penasihat keuangan otomotif profesional.\n` +
-        `Berikut adalah hasil kalkulasi kredit mobil:\n` +
-        `- Harga OTR: Rp ${calculationResult.onTheRoadPrice.toLocaleString("id-ID")}\n` +
-        `- Uang Muka (DP): Rp ${calculationResult.downPayment.toLocaleString("id-ID")}\n` +
-        `- Pokok Pinjaman: Rp ${calculationResult.loanAmount.toLocaleString("id-ID")}\n` +
-        `- Tenor: ${calculationResult.tenorMonths} bulan\n` +
-        `- Cicilan per Bulan: Rp ${calculationResult.monthlyInstallment.toLocaleString("id-ID")}\n\n` +
-        `Berikan analisis singkat dalam format JSON murni berstruktur:\n` +
-        `{\n  "financialHealthStatus": "Aman / Perlu Perhatian / Berisiko",\n  "insightText": "Paragraf pendek saran finansial rasional..."\n}`,
+      `Berikut adalah hasil kalkulasi kredit mobil:\n` +
+      `- Harga OTR: Rp ${calculationResult.onTheRoadPrice.toLocaleString("id-ID")}\n` +
+      `- Uang Muka (DP): Rp ${calculationResult.downPayment.toLocaleString("id-ID")}\n` +
+      `- Pokok Pinjaman: Rp ${calculationResult.loanAmount.toLocaleString("id-ID")}\n` +
+      `- Tenor: ${calculationResult.tenorMonths} bulan\n` +
+      `- Cicilan per Bulan: Rp ${calculationResult.monthlyInstallment.toLocaleString("id-ID")}\n\n` +
+      `Berikan analisis singkat dalam format JSON murni berstruktur:\n` +
+      `{\n  "financialHealthStatus": "Aman / Perlu Perhatian / Berisiko",\n  "insightText": "Paragraf pendek saran finansial rasional..."\n}`,
     );
 
     const userMsg = new HumanMessage(
@@ -301,18 +305,23 @@ export const handleCreditSimulation = async (req, res) => {
     }
 
     // Catat penggunaan token ke ai_usage_logs (Sesuai ERD)
-    const db = getDB();
-    await db.collection("ai_usage_logs").insertOne({
-      userId: new ObjectId(userId),
-      feature: "credit",
-      tokensUsed: 1,
-      metadata: {
-        carPrice,
-        tenorMonths,
-        monthlyInstallment: calculationResult.monthlyInstallment,
-      },
-      createdAt: new Date(),
-    });
+    try {
+      const db = getDB();
+      if (db && userId) {
+        const validUserId = ObjectId.isValid(userId)
+          ? new ObjectId(userId)
+          : String(userId);
+        await db.collection("ai_usage_logs").insertOne({
+          userId: validUserId,
+          feature: "credit",
+          tokensUsed: 1,
+          metadata: { carPrice, tenorMonths, monthlyInstallment: calculationResult.monthlyInstallment },
+          createdAt: new Date(),
+        });
+      }
+    } catch (logErr) {
+      console.warn("[AI Controller] Gagal simpan log credit:", logErr.message);
+    }
 
     // Kirim respons terstruktur ke Frontend
     return res.status(200).json({

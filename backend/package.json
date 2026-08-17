@@ -7,7 +7,9 @@
     "dev": "nodemon src/index.js",
     "start": "node src/index.js",
     "seed:cars": "node scripts/sync-cars.js",
-    "expiry:cron": "node scripts/run-expiry-cron.js"
+    "expiry:cron": "node scripts/run-expiry-cron.js",
+    "indexes": "node scripts/create-indexes.js",
+    "test:integration": "node scripts/integration.js"
   },
   "keywords": [],
   "author": "",
@@ -18,7 +20,6 @@
     "@langchain/openai": "^1.5.7",
     "axios": "^1.19.0",
     "bcrypt": "^6.0.0",
-    "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",

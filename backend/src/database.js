@@ -1,28 +1,18 @@
-import { MongoClient } from "mongodb";
-import dotenv from "dotenv";
-dotenv.config();
+// backend/src/database.js
+import { MongoClient } from 'mongodb';
+import { MONGODB_URI, MONGODB_DB_NAME } from './config/database.js';
 
 let client;
 let db;
 
 export const connectDB = async () => {
-  try {
-    if (!client) {
-      // Membuat instance MongoClient baru menggunakan URI dari file .env
-      client = new MongoClient(process.env.MONGODB_URI);
-      await client.connect();
-
-      // nama database 'rac_ai_db'
-      db = client.db("rac_ai_db");
-      console.log(
-        "[Database] Berhasil terhubung ke MongoDB via Native Driver & Mongoloquent stack",
-      );
-    }
-    return db;
-  } catch (error) {
-    console.error("[Database] Gagal terhubung ke MongoDB:", error.message);
-    process.exit(1);
+  if (!client) {
+    client = new MongoClient(MONGODB_URI);
+    await client.connect();
+    db = client.db(MONGODB_DB_NAME); 
+    console.log(`[Database] Connected: ${MONGODB_DB_NAME}`);
   }
+  return db;
 };
 
 export const getDB = () => db;

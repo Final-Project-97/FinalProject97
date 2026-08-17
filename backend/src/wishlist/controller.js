@@ -1,22 +1,22 @@
 import { Wishlist } from '../models/index.js';
-import { Car } from '../models/car.model.js';
+import Car from "../models/car.model.js";
 import { createWishlistSchema, updateWishlistSchema } from './validation.js';
 
 async function attachCarSummary(items) {
   const enriched = [];
   for (const item of items) {
-    const car = await Car.find(item.carId);
+    const car = await Car.where('_id', item.carId).first();
     enriched.push({
       ...item,
       car: car
         ? {
-            _id: car._id,
-            name: car.name,
-            brand: car.brand,
-            slug: car.slug,
-            thumbnailUrl: car.thumbnailUrl,
-            basePrice: car.basePrice,
-          }
+          _id: car._id,
+          name: car.name,
+          brand: car.brand,
+          slug: car.slug,
+          thumbnailUrl: car.thumbnailUrl,
+          basePrice: car.basePrice,
+        }
         : null,
     });
   }
@@ -51,7 +51,7 @@ export async function createWishlist(req, res) {
     const userId = String(req.user._id);
     const { carId, selectedColor, notes, source, matchScore, aiReason } = parsed.data;
 
-    const car = await Car.find(carId);
+    const car = await Car.where('_id', carId).first();
     if (!car) {
       return res.status(404).json({ success: false, message: 'Mobil tidak ditemukan' });
     }
