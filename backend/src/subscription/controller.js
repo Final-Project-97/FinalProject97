@@ -7,6 +7,7 @@ import {
   generateOrderId,
   isPaymentSuccess,
 } from './midtrans.js';
+import { checkoutSchema, webhookSchema } from './validation.js';
 
 export async function getStatus(req, res) {
   try {
@@ -26,6 +27,13 @@ export async function getStatus(req, res) {
 
 export async function checkout(req, res) {
   try {
+    const parsed = checkoutSchema.safeParse(req.body ?? {});
+    if (!parsed.success) {
+      return res.status(400).json({ success: false, message: 'Validasi gagal' });
+    }
+
+    const { paymentType } = parsed.data;
+
     const userId = String(req.user._id);
     const user = await User.where('_id', userId).first();
     const orderId = generateOrderId(userId);
@@ -57,7 +65,7 @@ export async function checkout(req, res) {
         orderId,
         amount: PREMIUM_PRICE,
         paymentStatus: 'pending',
-        paymentType: 'premium_monthly',
+        paymentType,
         startedAt: new Date(),
       },
     );
@@ -77,7 +85,13 @@ export async function checkout(req, res) {
 
 export async function webhook(req, res) {
   try {
+    const parsed = webhookSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ success: false, message: 'Payload webhook tidak valid' });
+    }
+
     const notification = await coreApi.transaction.notification(req.body);
+    
     const {
       order_id: orderId,
       transaction_status: transactionStatus,
