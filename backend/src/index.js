@@ -8,6 +8,7 @@ import { authRoutes } from "./auth/routes.js";
 import { showroomRoutes } from "./showrooms/routes.js";
 import { wishlistRoutes } from "./wishlist/routes.js";
 import { subscriptionRoutes } from "./subscription/routes.js";
+import { startExpiryCron } from "./subscription/expiry.job.js";
 
 dotenv.config();
 
@@ -43,6 +44,7 @@ const startServer = async () => {
     await connectDB();
     app.listen(PORT, () => {
       console.log(`[Server] Berjalan sukses di port ${PORT}`);
+      startExpiryCron();
     });
   } catch (error) {
     console.error("[Server] Gagal menyalakan server:", error);

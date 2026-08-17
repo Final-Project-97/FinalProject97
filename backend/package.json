@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "nodemon src/index.js",
     "start": "node src/index.js",
-    "seed:cars": "node scripts/sync-cars.js"
+    "seed:cars": "node scripts/sync-cars.js",
+    "expiry:cron": "node scripts/run-expiry-cron.js"
   },
   "keywords": [],
   "author": "",
