@@ -3,7 +3,7 @@ import { Link, Navigate, useNavigate } from "react-router";
 import { PiCheckCircle, PiSparkle, PiUserPlus } from "react-icons/pi";
 import racLogo from "../assets/RAC-Logo 1.png";
 import useAuth from "../context/useAuth";
-import "./Login.css";
+import "./login/Login.css";
 
 const initialForm = {
   name: "",

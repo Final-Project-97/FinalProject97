@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, Navigate, useLocation, useNavigate } from "react-router";
 import { PiCar, PiCheckCircle, PiSparkle } from "react-icons/pi";
-import racLogo from "../assets/RAC-Logo 1.png";
-import useAuth from "../context/useAuth";
+import racLogo from "../../assets/RAC-Logo 1.png";
+import useAuth from "../../context/useAuth";
 import "./Login.css";
 
 const GOOGLE_SCRIPT_URL = "https://accounts.google.com/gsi/client";

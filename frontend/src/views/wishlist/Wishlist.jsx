@@ -3,7 +3,7 @@ import { Link } from "react-router";
 import { PiHeart, PiPencilSimple, PiTrash, PiX } from "react-icons/pi";
 import Swal from "sweetalert2";
 import { toast } from "react-toastify";
-import { deleteWishlist, getWishlist, updateWishlist } from "../api/wishlist";
+import { deleteWishlist, getWishlist, updateWishlist } from "../../api/wishlist";
 import "./Wishlist.css";
 
 function formatPrice(value) {

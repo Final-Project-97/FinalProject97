@@ -2,11 +2,11 @@ import { useState } from "react";
 import { Link } from "react-router";
 import { PiArrowRight, PiHeart, PiLightning, PiQuestion } from "react-icons/pi";
 import { toast } from "react-toastify";
-import { getRecommendations } from "../api/ai";
-import { getCarById } from "../api/cars";
-import { addWishlist } from "../api/wishlist";
-import useAuth from "../context/useAuth";
-import useShowrooms from "../context/useShowrooms";
+import { getRecommendations } from "../../api/ai";
+import { getCarById } from "../../api/cars";
+import { addWishlist } from "../../api/wishlist";
+import useAuth from "../../context/useAuth";
+import useShowrooms from "../../context/useShowrooms";
 import "./Recommend.css";
 
 const needOptions = ["Family", "City Car", "SUV", "MPV", "Business", "Adventure"];

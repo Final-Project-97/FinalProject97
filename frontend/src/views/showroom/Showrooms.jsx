@@ -1,5 +1,5 @@
 import { PiArrowSquareOut, PiMapPin, PiNavigationArrow } from "react-icons/pi";
-import useShowrooms from "../context/useShowrooms";
+import useShowrooms from "../../context/useShowrooms";
 import "./Showrooms.css";
 
 function formatDistance(distance) {
