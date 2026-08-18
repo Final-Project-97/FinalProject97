@@ -48,7 +48,7 @@ export default function Footer() {
                         </Link>
                      </li>
                      <li>
-                        <Link to="/simulasi-kredit" className="hover:text-white transition-colors">
+                        <Link to="/credit" className="hover:text-white transition-colors">
                            Credit & Loan Simulator
                         </Link>
                      </li>

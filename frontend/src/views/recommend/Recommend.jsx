@@ -456,7 +456,7 @@ function Recommend() {
           </p>
           <Link
             className="mt-8 inline-flex items-center gap-2 rounded-2xl bg-blue-600 px-8 py-4 font-bold transition hover:bg-blue-500"
-            to="/cars"
+            to="/catalog"
           >
             View Full Catalog <PiArrowRight />
           </Link>

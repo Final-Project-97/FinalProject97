@@ -97,7 +97,7 @@ export default function Wishlist() {
             <PiHeart />
             <h2>Your wishlist is empty</h2>
             <p>Add a car from the catalog, car detail, or AI recommendations.</p>
-            <Link to="/cars">Explore Catalog</Link>
+            <Link to="/catalog">Explore Catalog</Link>
           </section>
         )}
 

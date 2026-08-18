@@ -30,7 +30,7 @@ export default function PreFooter() {
                   <span>Start AI Consultation</span>
                </Link>
                <Link
-                  to="/simulasi-kredit"
+                  to="/credit"
                   className="flex items-center justify-center gap-1.5 bg-[#141620] hover:bg-white/10 border border-white/15 text-gray-300 hover:text-white text-xs sm:text-sm font-semibold px-6 py-3.5 rounded-full transition-all cursor-pointer"
                >
                   <span>Credit Simulation</span>
