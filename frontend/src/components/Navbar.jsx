@@ -75,7 +75,7 @@ export default function Navbar() {
                             <NavLink to="/catalog" className={getDesktopNavClass}>
                                 Catalog
                             </NavLink>
-                            <NavLink to="/recomendation" className={getDesktopNavClass}>
+                            <NavLink to="/recommendation" className={getDesktopNavClass}>
                                 AI Recommendation
                             </NavLink>
                             <NavLink to="/credit" className={getDesktopNavClass}>
@@ -241,7 +241,7 @@ export default function Navbar() {
                             <span>Catalog</span>
                         </NavLink>
                         <NavLink
-                            to="/recomendation"
+                            to="/recommendation"
                             onClick={() => setIsOpen(false)}
                             className={getMobileNavClass}
                         >
