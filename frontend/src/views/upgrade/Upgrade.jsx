@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { PiCheckCircle, PiCrown, PiLightning, PiShieldCheck, PiSparkle } from "react-icons/pi";
 import { toast } from "react-toastify";
-import { createSubscriptionCheckout, getSubscriptionStatus } from "../api/subscription";
-import useAuth from "../context/useAuth";
+import { createSubscriptionCheckout, getSubscriptionStatus } from "../../api/subscription";
+import useAuth from "../../context/useAuth";
 import "./Upgrade.css";
 
 const SNAP_SANDBOX_URL = "https://app.sandbox.midtrans.com/snap/snap.js";
