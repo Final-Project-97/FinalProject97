@@ -6,6 +6,12 @@ import useAuth from "../../context/useAuth";
 import "./Upgrade.css";
 
 const SNAP_SANDBOX_URL = "https://app.sandbox.midtrans.com/snap/snap.js";
+const PAYMENT_STATUS_ATTEMPTS = 8;
+const PAYMENT_STATUS_INTERVAL_MS = 1500;
+
+function delay(duration) {
+  return new Promise((resolve) => setTimeout(resolve, duration));
+}
 
 function formatCurrency(value) {
   return new Intl.NumberFormat("id-ID", {
@@ -56,6 +62,7 @@ export default function Upgrade() {
   const [status, setStatus] = useState(null);
   const [isLoadingStatus, setIsLoadingStatus] = useState(true);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const [isConfirmingPayment, setIsConfirmingPayment] = useState(false);
   const isMockMode = import.meta.env.VITE_USE_MOCK === "true";
 
   const refreshStatus = useCallback(async () => {
@@ -84,9 +91,35 @@ export default function Upgrade() {
     };
   }, []);
 
+  async function waitForPremiumActivation() {
+    for (let attempt = 0; attempt < PAYMENT_STATUS_ATTEMPTS; attempt += 1) {
+      const currentStatus = await refreshStatus();
+      if (currentStatus?.premiumActive) {
+        await refreshUser();
+        return true;
+      }
+
+      if (attempt < PAYMENT_STATUS_ATTEMPTS - 1) {
+        await delay(PAYMENT_STATUS_INTERVAL_MS);
+      }
+    }
+
+    await refreshUser();
+    return false;
+  }
+
   async function handlePaymentSuccess() {
-    await Promise.all([refreshUser(), refreshStatus()]);
-    toast.success("Payment completed. Premium access is now being updated.");
+    setIsConfirmingPayment(true);
+    try {
+      const isPremiumActive = await waitForPremiumActivation();
+      if (isPremiumActive) {
+        toast.success("Payment confirmed. Premium access is now active.");
+      } else {
+        toast.info("Payment was received. Premium activation is still being confirmed.");
+      }
+    } finally {
+      setIsConfirmingPayment(false);
+    }
   }
 
   async function handleCheckout() {
@@ -159,8 +192,8 @@ export default function Upgrade() {
                 <li><PiCheckCircle /> AI-powered credit insights</li>
                 <li><PiCheckCircle /> Premium access for 30 days</li>
               </ul>
-              <button disabled={isCheckingOut} onClick={handleCheckout} type="button">
-                <PiLightning /> {isCheckingOut ? "Preparing payment..." : "Upgrade with Midtrans"}
+              <button disabled={isCheckingOut || isConfirmingPayment} onClick={handleCheckout} type="button">
+                <PiLightning /> {isCheckingOut ? "Preparing payment..." : isConfirmingPayment ? "Confirming payment..." : "Upgrade with Midtrans"}
               </button>
               <small>Secure sandbox payment powered by Midtrans.</small>
             </article>
