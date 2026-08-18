@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, NavLink } from "react-router";
 import racLogo from "../assets/RAC-Logo 1.png";
+import useAuth from "../context/useAuth";
 import {
     PiHeart,
     PiUser,
@@ -16,21 +17,14 @@ import {
 } from "react-icons/pi";
 
 export default function Navbar() {
+    const { user, isAuthenticated, signOut } = useAuth();
     const [isOpen, setIsOpen] = useState(false);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
 
-    // Mock User Data
-    const user = {
-        isLoggedIn: true,
-        name: "Budi Santoso",
-        email: "budi@example.com",
-        plan: "free",
-        aiTokensRemaining: 5,
-        avatar: null,
-    };
-
     // Google Avatar & DiceBear Fallback
-    const avatarUrl = user.avatar || user.picture || `https://api.dicebear.com/10.x/weave/svg?seed=${encodeURIComponent(user.name || "User")}`;
+    const avatarUrl = user?.avatar || user?.picture || `https://api.dicebear.com/10.x/weave/svg?seed=${encodeURIComponent(user?.name || user?.email || "User")}`;
+    const userPlan = user?.plan || "free";
+    const remainingTokens = user?.aiTokensRemaining ?? 5;
 
     // Desktop NavLink Style
     const getDesktopNavClass = ({ isActive }) =>
@@ -85,13 +79,13 @@ export default function Navbar() {
 
                         {/* Right Section */}
                         <div className="flex items-center gap-3">
-                            {user.isLoggedIn ? (
+                            {isAuthenticated ? (
                                 <>
                                     {/* AI Token Badge */}
-                                    {user.plan === "free" ? (
+                                    {userPlan === "free" ? (
                                         <div className="hidden sm:flex items-center gap-1.5 bg-blue-600/10 border border-blue-500/25 text-blue-400 text-xs font-semibold px-3 py-1.5 rounded-full">
                                             <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
-                                            <span>{user.aiTokensRemaining} Tokens</span>
+                                            <span>{remainingTokens} Tokens</span>
                                         </div>
                                     ) : (
                                         <div className="hidden sm:flex items-center gap-1.5 bg-amber-500/10 border border-amber-500/25 text-amber-400 text-xs font-semibold px-3 py-1.5 rounded-full">
@@ -108,16 +102,16 @@ export default function Navbar() {
                                         >
                                             <img
                                                 src={avatarUrl}
-                                                alt={user.name}
+                                                alt={user?.name || "User"}
                                                 referrerPolicy="no-referrer"
                                                 className="w-7 h-7 rounded-full bg-blue-600 object-cover border border-white/10"
                                             />
                                             <div className="hidden md:flex flex-col text-left">
                                                 <span className="text-xs font-bold text-white leading-tight">
-                                                    {user.name}
+                                                    {user?.name || "User"}
                                                 </span>
                                                 <span className="text-[10px] text-gray-400 font-medium capitalize">
-                                                    {user.plan === "free" ? "Free Plan" : "Premium"}
+                                                    {userPlan === "free" ? "Free Plan" : "Premium"}
                                                 </span>
                                             </div>
                                             <PiCaretDown className={`text-xs text-gray-400 transition-transform ${isProfileOpen ? "rotate-180" : ""}`} />
@@ -132,8 +126,8 @@ export default function Navbar() {
                                                 />
                                                 <div className="absolute right-0 mt-2 w-52 bg-[#0C0E16] border border-white/10 rounded-2xl p-2 shadow-2xl z-50 flex flex-col gap-1">
                                                     <div className="px-3 py-2 border-b border-white/5 md:hidden">
-                                                        <p className="text-xs font-bold text-white">{user.name}</p>
-                                                        <p className="text-[10px] text-blue-400 font-semibold">{user.aiTokensRemaining} Tokens Remaining</p>
+                                                        <p className="text-xs font-bold text-white">{user?.name || "User"}</p>
+                                                        <p className="text-[10px] text-blue-400 font-semibold">{remainingTokens} Tokens Remaining</p>
                                                     </div>
 
                                                     <Link
@@ -145,7 +139,7 @@ export default function Navbar() {
                                                         <span>My Wishlist</span>
                                                     </Link>
 
-                                                    {user.plan === "free" && (
+                                                    {userPlan === "free" && (
                                                         <Link
                                                             to="/upgrade"
                                                             onClick={() => setIsProfileOpen(false)}
@@ -159,6 +153,7 @@ export default function Navbar() {
                                                     <button
                                                         onClick={() => {
                                                             setIsProfileOpen(false);
+                                                            signOut();
                                                         }}
                                                         className="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-red-400 hover:bg-red-500/10 rounded-xl transition-colors w-full text-left cursor-pointer border-t border-white/5 mt-1 pt-2"
                                                     >
@@ -208,17 +203,17 @@ export default function Navbar() {
                     </div>
 
                     {/* Mobile User Info */}
-                    {user.isLoggedIn && (
+                    {isAuthenticated && (
                         <div className="flex items-center gap-3 p-3 bg-white/5 border border-white/10 rounded-2xl mt-4">
                             <img
                                 src={avatarUrl}
-                                alt={user.name}
+                                alt={user?.name || "User"}
                                 referrerPolicy="no-referrer"
                                 className="w-10 h-10 rounded-full bg-blue-600 object-cover"
                             />
                             <div>
-                                <h4 className="text-xs font-bold text-white">{user.name}</h4>
-                                <span className="text-[10px] text-blue-400 font-semibold">{user.aiTokensRemaining} Tokens Remaining</span>
+                                <h4 className="text-xs font-bold text-white">{user?.name || "User"}</h4>
+                                <span className="text-[10px] text-blue-400 font-semibold">{remainingTokens} Tokens Remaining</span>
                             </div>
                         </div>
                     )}
@@ -268,10 +263,11 @@ export default function Navbar() {
                 </div>
 
                 <div className="pt-6 border-t border-white/10">
-                    {user.isLoggedIn ? (
+                    {isAuthenticated ? (
                         <button
                             onClick={() => {
                                 setIsOpen(false);
+                                signOut();
                             }}
                             className="flex items-center justify-center gap-2 w-full bg-red-600/10 hover:bg-red-600/20 text-red-400 text-sm font-semibold py-3 rounded-full border border-red-500/20 transition-all cursor-pointer"
                         >

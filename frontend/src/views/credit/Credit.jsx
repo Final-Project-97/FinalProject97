@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router";
 import { PiCreditCard, PiLightbulb, PiX } from "react-icons/pi";
-import { simulateCredit } from "../api/ai";
-import { getCarById } from "../api/cars";
-import useAuth from "../context/useAuth";
+import { simulateCredit } from "../../api/ai";
+import { getCarById } from "../../api/cars";
+import useAuth from "../../context/useAuth";
 import "./Credit.css";
 
 const tenorOptions = [12, 24, 36, 48, 60];
