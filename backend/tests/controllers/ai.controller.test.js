@@ -148,6 +148,18 @@ describe('ai controller', () => {
     expect(getStatus(res)).toBe(400);
   });
 
+  it('handleAIChat redirects follow-up recommendation requests', async () => {
+    const res = mockRes();
+    await handleAIChat(mockReq({ ...aiReq, body: { message: 'rekomendasi lain' } }), res);
+
+    const data = getJson(res).data;
+    expect(getStatus(res)).toBe(200);
+    expect(data.replyType).toBe('text');
+    expect(data.items).toBeNull();
+    expect(data.reply).toMatch(/AI Recommendation feature/i);
+    expect(mockInvokeGroq).not.toHaveBeenCalled();
+  });
+
   it('handleAIRecommend 400 without budget', async () => {
     const res = mockRes();
     await handleAIRecommend(mockReq({ ...aiReq, body: {} }), res);

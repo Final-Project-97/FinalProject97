@@ -11,6 +11,11 @@ import {
   parseJsonFromLlm,
 } from '../ai/catalog.helper.js';
 
+const REDIRECT_TO_RECOMMEND_MESSAGE =
+  'For additional car recommendations, please use the AI Recommendation feature on this platform. ' +
+  'You can set budget, passenger count, and preferences there for more accurate results. ' +
+  'In chat, I can only provide one recommendation list per request.';
+
 function aiMeta(req) {
   return {
     accessType: req.aiAccessType,
@@ -55,11 +60,43 @@ function validateChatRecommendationItems(rawItems, cars) {
     });
 }
 
+function extractChatJsonFromLlm(content) {
+  let text = String(content ?? '').trim();
+
+  text = text.replace(/```json/gi, '').replace(/```/g, '').trim();
+  text = text.replace(/^---+\s*FORMAT[^\n]*---+\s*/gim, '').trim();
+  text = text.replace(/^--+\s*FORMAT[^\n]*--+\s*/gim, '').trim();
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    const match = text.match(/\{[\s\S]*\}/);
+    if (!match) throw new Error('No JSON object found in LLM response');
+    return JSON.parse(match[0]);
+  }
+}
+
+function looksLikeLeakedAiFormat(rawContent) {
+  const text = String(rawContent ?? '');
+  return (
+    /FORMAT\s+[ACR]/i.test(text) ||
+    /"replyType"\s*:/.test(text) ||
+    /"items"\s*:\s*\[/.test(text)
+  );
+}
+
+function isFollowUpRecommendationRequest(message) {
+  const m = String(message ?? '').toLowerCase().trim();
+  return /rekomendasi\s*(lain|lainnya)|other\s*recommendations?|show\s*more|more\s*options?|opsi\s*lain|pilihan\s*lain|selain\s*(itu|ini|tersebut)/i.test(
+    m,
+  );
+}
+
 function parseChatAiResponse(rawContent, cars) {
   const fallbackText = String(rawContent ?? '').trim();
 
   try {
-    const parsed = parseJsonFromLlm(rawContent);
+    const parsed = extractChatJsonFromLlm(rawContent);
 
     if (parsed?.replyType === 'recommendations') {
       const items = validateChatRecommendationItems(parsed.items, cars);
@@ -92,6 +129,15 @@ function parseChatAiResponse(rawContent, cars) {
     // bukan JSON → plain text
   }
 
+  if (looksLikeLeakedAiFormat(fallbackText)) {
+    return {
+      replyType: 'text',
+      reply:
+        'Sorry, I could not format the recommendation properly. Please try again or use the AI Recommendation feature.',
+      items: null,
+    };
+  }
+
   return {
     replyType: 'text',
     reply: fallbackText,
@@ -111,15 +157,30 @@ export async function handleAIChat(req, res) {
       });
     }
 
-    const activeCars = await getActiveCars(20);
+    // Block follow-up recommendation requests — arahkan ke fitur Recommendation
+    if (isFollowUpRecommendationRequest(message)) {
+      return res.status(200).json({
+        success: true,
+        data: {
+          replyType: 'text',
+          reply: REDIRECT_TO_RECOMMEND_MESSAGE,
+          items: null,
+          recommendations: null,
+          cars: null,
+          ...aiMeta(req),
+        },
+      });
+    }
+
+    const activeCars = await getActiveCars();
 
     const catalogSummary = (activeCars || [])
       .map(
         (car) =>
           formatCarChatCatalogLine?.(car) ??
           `- ID: ${car._id}, Slug: ${car.slug}, Name: ${car.name}, Brand: ${car.brand}, ` +
-          `Type: ${car.type}, Price: Rp ${(Number(car.basePrice) || 0).toLocaleString('id-ID')}, ` +
-          `Seats: ${car.specs?.seats || 5}, Transmission: ${car.specs?.transmission || 'N/A'}`,
+            `Type: ${car.type}, Price: Rp ${(Number(car.basePrice) || 0).toLocaleString('id-ID')}, ` +
+            `Seats: ${car.specs?.seats || 5}, Transmission: ${car.specs?.transmission || 'N/A'}`,
       )
       .join('\n');
 
@@ -129,50 +190,44 @@ export async function handleAIChat(req, res) {
       `${catalogSummary || 'Catalog unavailable.'}\n\n` +
       `ALLOWED TOPICS (you may answer ONLY these):\n` +
       `- Cars in the catalog above (price, specs, availability, comparison)\n` +
-      `- Car recommendations from the catalog\n` +
+      `- ONE car recommendation list per explicit request\n` +
       `- RAC AI platform features (catalog, wishlist, showroom, premium, credit simulation for cars)\n` +
       `- General car-buying guidance tied to vehicles in the catalog\n\n` +
       `FORBIDDEN: politics, government programs, food/nutrition, history, math, celebrities, weather, sports, homework, or ANY topic not listed above.\n\n` +
       `CLASSIFY each user message:\n` +
-      `- RECOMMENDATION: suggest/list/compare multiple cars from catalog\n` +
+      `- RECOMMENDATION: user explicitly asks to recommend/suggest/list multiple cars\n` +
       `- ON-TOPIC: single question about catalog cars or car buying on RAC AI\n` +
-      `- OFF-TOPIC: anything else\n\n` +
-      `Use exactly ONE format:\n\n` +
-      `--- FORMAT C (RECOMMENDATION) ---\n` +
-      `- Output ONLY valid JSON:\n` +
-      `{\n` +
-      `  "replyType": "recommendations",\n` +
-      `  "reply": "<1 short intro>",\n` +
-      `  "items": [{ "carId": "...", "slug": "...", "name": "...", "brand": "...", "basePrice": 0, "type": "...", "aiReason": "..." }]\n` +
-      `}\n` +
-      `- Max 5 items. carId and slug MUST match catalog exactly.\n` +
-      `- If no match: { "replyType": "text", "reply": "No vehicles in the RAC AI catalog match your criteria at this time." }\n\n` +
-      `--- FORMAT A (ON-TOPIC, plain text) ---\n` +
+      `- OFF-TOPIC: anything else\n` +
+      `- FOLLOW-UP RECOMMENDATION: user asks for "more recommendations", "rekomendasi lain", "other options" → plain text redirect only\n\n` +
+      `RECOMMENDATION RULES:\n` +
+      `- Output ONLY a single raw JSON object. No headings. No "FORMAT C". No markdown fences. No text before or after JSON.\n` +
+      `- Schema:\n` +
+      `{"replyType":"recommendations","reply":"<1 short intro>","items":[{"carId":"...","slug":"...","aiReason":"..."}]}\n` +
+      `- Max 5 items. carId and slug MUST match catalog exactly. Do NOT invent cars.\n` +
+      `- If no match: {"replyType":"text","reply":"No vehicles in the RAC AI catalog match your criteria at this time."}\n\n` +
+      `ON-TOPIC RULES:\n` +
       `- English only. Plain text only (NOT JSON).\n` +
       `- Use ONLY catalog data. Never invent specs/prices.\n` +
       `- No Markdown tables, |, #, or **bold**.\n\n` +
-      `--- FORMAT R (OFF-TOPIC — REFUSAL ONLY) ---\n` +
+      `FOLLOW-UP RECOMMENDATION RULES:\n` +
+      `- If user asks for more/other recommendations ("rekomendasi lain", "show more", etc.), reply with plain text ONLY:\n` +
+      `"${REDIRECT_TO_RECOMMEND_MESSAGE}"\n\n` +
+      `OFF-TOPIC RULES:\n` +
       `- English only. Plain text only (NOT JSON).\n` +
-      `- You MUST reply with EXACTLY this message and NOTHING else (no extra words, no explanation, no answer to their question):\n` +
-      `"I'm RAC AI, your car recommendation assistant. I can only help with questions about vehicles in our catalog, car recommendations, and car-related topics on this platform. Please ask me about cars or use the recommendation feature."\n` +
-      `- NEVER provide facts, definitions, or advice for OFF-TOPIC questions.\n` +
-      `- NEVER use the old prefix "I was built as a smart virtual assistant... The answer to your question is:"\n\n` +
-      `EXAMPLES:\n\n` +
-      `User: "Recommend 3 hatchbacks under 300 million"\n` +
-      `→ FORMAT C JSON\n\n` +
-      `User: "How much is the Honda Brio?"\n` +
-      `→ FORMAT A\n\n` +
-      `User: "program makanan bergizi gratis"\n` +
-      `→ FORMAT R (exact refusal message only)\n\n` +
-      `User: "Who is the 7th president of Indonesia?"\n` +
-      `→ FORMAT R (exact refusal message only)\n\n` +
-      `User: "What is 5 + 5?"\n` +
-      `→ FORMAT R (exact refusal message only)\n\n` +
+      `- Reply with EXACTLY this message and NOTHING else:\n` +
+      `"I'm RAC AI, your car recommendation assistant. I can only help with questions about vehicles in our catalog, car recommendations, and car-related topics on this platform. Please ask me about cars or use the recommendation feature."\n\n` +
+      `EXAMPLES:\n` +
+      `User: "Recommend 3 hatchbacks under 300 million" → JSON recommendations\n` +
+      `User: "How much is the Honda Brio?" → plain text\n` +
+      `User: "rekomendasi lain" → redirect message (plain text, NOT JSON)\n` +
+      `User: "program makanan bergizi gratis" → exact refusal message only\n\n` +
       `FINAL CHECK:\n` +
-      `- OFF-TOPIC → FORMAT R only. Do NOT answer the question.\n` +
-      `- When in doubt → treat as OFF-TOPIC and use FORMAT R.`;
+      `- OFF-TOPIC → refusal only.\n` +
+      `- FOLLOW-UP RECOMMENDATION → redirect message only.\n` +
+      `- RECOMMENDATION → raw JSON only.\n` +
+      `- When in doubt → treat as OFF-TOPIC.`;
 
-    const aiResponse = await invokeGroq(systemText, message, { temperature: 0.5 });
+    const aiResponse = await invokeGroq(systemText, message, { temperature: 0.1 });
 
     const chatPayload = parseChatAiResponse(aiResponse.content, activeCars);
 
@@ -192,6 +247,8 @@ export async function handleAIChat(req, res) {
         replyType: chatPayload.replyType,
         reply: chatPayload.reply,
         items: chatPayload.items,
+        recommendations: chatPayload.items,
+        cars: chatPayload.items,
         ...aiMeta(req),
       },
     });
