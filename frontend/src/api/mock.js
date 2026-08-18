@@ -44,6 +44,14 @@ const mockShowrooms = [
 ];
 
 const mockWishlist = [];
+let mockSubscription = {
+  premiumActive: false,
+  expiresAt: null,
+  daysRemaining: 0,
+  paymentStatus: null,
+  paymentType: "premium_monthly",
+  aiTokensRemaining: mockUser.aiTokensRemaining,
+};
 
 function clone(data) {
   return JSON.parse(JSON.stringify(data));
@@ -98,9 +106,9 @@ export async function getMockResponse(path, options = {}) {
       user: mockUser,
       aiTokensRemaining: mockUser.aiTokensRemaining,
       subscription: {
-        expiresAt: null,
-        daysRemaining: 0,
-        paymentStatus: null,
+        expiresAt: mockSubscription.expiresAt,
+        daysRemaining: mockSubscription.daysRemaining,
+        paymentStatus: mockSubscription.paymentStatus,
       },
     });
   }
@@ -221,16 +229,19 @@ export async function getMockResponse(path, options = {}) {
   if (pathname === "/api/subscription/status" && method === "GET") {
     return {
       success: true,
-      data: {
-        isPremium: false,
-        expiresAt: null,
-        daysRemaining: 0,
-        aiTokensRemaining: 5,
-      },
+      data: clone(mockSubscription),
     };
   }
 
   if (pathname === "/api/subscription/checkout" && method === "POST") {
+    const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+    mockSubscription = {
+      ...mockSubscription,
+      premiumActive: true,
+      expiresAt: expiresAt.toISOString(),
+      daysRemaining: 30,
+      paymentStatus: "success",
+    };
     return {
       success: true,
       snapToken: "mock-snap-token",

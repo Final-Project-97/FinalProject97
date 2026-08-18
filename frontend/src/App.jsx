@@ -8,9 +8,10 @@ import Catalog from "./views/Catalog";
 import Recommend from "./views/recommend/Recommend";
 import AuthProvider from "./context/AuthContext";
 import ShowroomProvider from "./context/ShowroomContext";
-import Showrooms from "./views/showroom/Showrooms";
-import Credit from "./views/credit/Credit";
-import Wishlist from "./views/wishlist/Wishlist";
+import Showrooms from "./views/Showrooms";
+import Credit from "./views/Credit";
+import Wishlist from "./views/Wishlist";
+import Upgrade from "./views/Upgrade";
 import ProtectedRoute from "./components/shared/ProtectedRoute";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -54,6 +55,16 @@ function App() {
               />
             </Route>
           </Routes>
+            <Route
+              path="/upgrade"
+              element={
+                <ProtectedRoute>
+                  <Upgrade />
+                </ProtectedRoute>
+              }
+            />
+          </Route>
+        </Routes>
         </AuthProvider>
       </BrowserRouter>
       <ToastContainer position="top-right" theme="dark" />
