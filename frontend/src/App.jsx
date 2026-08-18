@@ -14,7 +14,7 @@ function App() {
 
           <Route element={<BaseLayout />}>
             <Route path="/" element={<Home />} />
-            <Route path="/cars" element={<Catalog />} />
+            <Route path="/catalog" element={<Catalog />} />
             <Route path="/cars/:id" element={<CarDetail />} />
             {/* Placeholder routes for Brian */}
             {/* <Route path="/credit" element={<Credit />} /> */}
