@@ -18,7 +18,7 @@ export default function Footer() {
             {/* Main Footer Links */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-8 pb-14 border-b border-white/10">
 
-               {/* Column 1: Brand & Bio */}
+               {/* Brand & Bio */}
                <div className="lg:col-span-4 flex flex-col justify-between space-y-6">
                   <div>
                      <Link to="/" className="inline-block hover:opacity-90 transition-opacity">
@@ -30,7 +30,7 @@ export default function Footer() {
                   </div>
                </div>
 
-               {/* Column 2: Platform Features */}
+               {/* Platform Features */}
                <div className="lg:col-span-3 lg:pl-6">
                   <p className="text-white text-xs font-bold uppercase tracking-wider mb-4">
                      Platform Features
@@ -60,7 +60,7 @@ export default function Footer() {
                   </ul>
                </div>
 
-               {/* Column 3: Account & Plans */}
+               {/* Account & Plans */}
                <div className="lg:col-span-2">
                   <p className="text-white text-xs font-bold uppercase tracking-wider mb-4">
                      Account & Plans
@@ -89,7 +89,7 @@ export default function Footer() {
                   </ul>
                </div>
 
-               {/* Column 4: Security & Support */}
+               {/* Security & Support */}
                <div className="lg:col-span-3">
                   <p className="text-white text-xs font-bold uppercase tracking-wider mb-4">
                      Security & Support
