@@ -53,20 +53,18 @@ function App() {
                   </ProtectedRoute>
                 }
               />
+              <Routes
+                path="/upgrade"
+                element={
+                  <ProtectedRoute>
+                    <Upgrade />
+                  </ProtectedRoute>
+                }
+              />
             </Route>
           </Routes>
-            <Route
-              path="/upgrade"
-              element={
-                <ProtectedRoute>
-                  <Upgrade />
-                </ProtectedRoute>
-              }
-            />
-          </Route>
-        </Routes>
-        </AuthProvider>
-      </BrowserRouter>
+        </AuthProvider >
+      </BrowserRouter >
       <ToastContainer position="top-right" theme="dark" />
     </>
   )
