@@ -8,6 +8,7 @@ import Recommend from "./views/Recommend";
 import AuthProvider from "./context/AuthContext";
 import ShowroomProvider from "./context/ShowroomContext";
 import Showrooms from "./views/Showrooms";
+import Credit from "./views/Credit";
 
 function App() {
   return (
@@ -36,6 +37,14 @@ function App() {
                 <ShowroomProvider>
                   <Showrooms />
                 </ShowroomProvider>
+              }
+            />
+            <Route
+              path="/simulasi-kredit"
+              element={
+                <AuthProvider>
+                  <Credit />
+                </AuthProvider>
               }
             />
             {/* Placeholder routes for Brian */}
