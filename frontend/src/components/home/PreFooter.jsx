@@ -4,7 +4,7 @@ import { Link } from "react-router";
 export default function PreFooter() {
    return (
       <section className="max-w-7xl mx-auto px-6 lg:px-12 pt-8 pb-16 lg:pt-12 lg:pb-24">
-         <div className="w-full bg-gradient-to-b from-[#141620] to-[#0E1017] border border-white/10 rounded-3xl p-8 sm:p-12 shadow-2xl relative overflow-hidden flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+         <div className="w-full bg-gradient-to-b from-[#141620] to-[#0E1017] border border-slate-800 rounded-xl p-8 sm:p-12 shadow-2xl relative overflow-hidden flex flex-col lg:flex-row lg:items-center justify-between gap-8">
 
             <div className="absolute -top-24 -right-24 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
 

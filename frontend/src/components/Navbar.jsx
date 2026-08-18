@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router";
+import { Link, NavLink } from "react-router";
 import racLogo from "../assets/RAC-Logo 1.png";
 import {
     PiHeart,
@@ -8,11 +8,25 @@ import {
     PiX,
     PiHouse,
     PiSparkle,
-    PiCalculator
+    PiCalculator,
+    PiCar
 } from "react-icons/pi";
 
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
+
+    // NavLink Active Styles
+    const getDesktopNavClass = ({ isActive }) =>
+        `text-xs font-medium px-4 py-1.5 rounded-full transition-all ${isActive
+            ? "bg-blue-600 text-white font-semibold shadow-sm"
+            : "text-gray-300 hover:text-white hover:bg-white/10"
+        }`;
+
+    const getMobileNavClass = ({ isActive }) =>
+        `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors ${isActive
+            ? "bg-blue-600 text-white font-semibold shadow-sm"
+            : "text-gray-300 hover:text-white hover:bg-white/5"
+        }`;
 
     return (
         <>
@@ -20,7 +34,7 @@ export default function Navbar() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between h-[66px]">
 
-                        {/* Mobile Button & Logo */}
+                        {/* Logo */}
                         <div className="flex items-center gap-3">
                             <button
                                 onClick={() => setIsOpen(true)}
@@ -34,20 +48,23 @@ export default function Navbar() {
                             </Link>
                         </div>
 
-                        {/* Desktop Menu */}
+                        {/* Desktop Nav */}
                         <nav className="hidden lg:flex items-center gap-2">
-                            <Link to="/" className="bg-blue-600 text-white text-xs font-semibold px-4 py-1.5 rounded-full shadow-sm">
+                            <NavLink to="/" className={getDesktopNavClass}>
                                 Home
-                            </Link>
-                            <Link to="/recomendation" className="text-gray-300 hover:text-white hover:bg-white/10 text-xs font-medium px-4 py-1.5 rounded-full transition-all">
+                            </NavLink>
+                            <NavLink to="/cars" className={getDesktopNavClass}>
+                                Catalog
+                            </NavLink>
+                            <NavLink to="/recomendation" className={getDesktopNavClass}>
                                 AI Recommendation
-                            </Link>
-                            <Link to="/simulasi-kredit" className="text-gray-300 hover:text-white hover:bg-white/10 text-xs font-medium px-4 py-1.5 rounded-full transition-all">
+                            </NavLink>
+                            <NavLink to="/simulasi-kredit" className={getDesktopNavClass}>
                                 Credit Plan
-                            </Link>
+                            </NavLink>
                         </nav>
 
-                        {/* Right Buttons */}
+                        {/* Actions */}
                         <div className="flex items-center gap-3">
                             <button className="btn btn-ghost btn-circle btn-sm text-gray-300 hover:text-white hover:bg-white/10" aria-label="Wishlist">
                                 <PiHeart className="text-xl" />
@@ -62,13 +79,14 @@ export default function Navbar() {
                 </div>
             </header>
 
-            {/* Mobile Drawer */}
+            {/* Mobile Drawer Overlay */}
             <div
                 onClick={() => setIsOpen(false)}
                 className={`fixed inset-0 bg-black/80 backdrop-blur-sm z-50 transition-opacity duration-300 lg:hidden ${isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
                     }`}
             />
 
+            {/* Mobile Drawer */}
             <aside
                 style={{ backgroundColor: "#0C0E16" }}
                 className={`fixed top-0 left-0 bottom-0 w-[280px] sm:w-[320px] border-r border-white/10 z-50 p-6 flex flex-col justify-between shadow-2xl transition-transform duration-300 ease-in-out lg:hidden ${isOpen ? "translate-x-0" : "-translate-x-full"
@@ -86,38 +104,46 @@ export default function Navbar() {
                     </div>
 
                     <nav className="flex flex-col gap-2 mt-6">
-                        <Link
+                        <NavLink
                             to="/"
                             onClick={() => setIsOpen(false)}
-                            className="flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-600 text-white text-sm font-semibold shadow-sm"
+                            className={getMobileNavClass}
                         >
                             <PiHouse className="text-lg" />
                             <span>Home</span>
-                        </Link>
-                        <Link
+                        </NavLink>
+                        <NavLink
+                            to="/cars"
+                            onClick={() => setIsOpen(false)}
+                            className={getMobileNavClass}
+                        >
+                            <PiCar className="text-lg text-blue-400" />
+                            <span>Catalog</span>
+                        </NavLink>
+                        <NavLink
                             to="/recomendation"
                             onClick={() => setIsOpen(false)}
-                            className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-300 hover:text-white hover:bg-white/5 text-sm font-medium transition-colors"
+                            className={getMobileNavClass}
                         >
                             <PiSparkle className="text-lg text-blue-400" />
                             <span>AI Recommendation</span>
-                        </Link>
-                        <Link
+                        </NavLink>
+                        <NavLink
                             to="/simulasi-kredit"
                             onClick={() => setIsOpen(false)}
-                            className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-300 hover:text-white hover:bg-white/5 text-sm font-medium transition-colors"
+                            className={getMobileNavClass}
                         >
                             <PiCalculator className="text-lg" />
                             <span>Credit Plan</span>
-                        </Link>
-                        <Link
+                        </NavLink>
+                        <NavLink
                             to="/wishlist"
                             onClick={() => setIsOpen(false)}
-                            className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-300 hover:text-white hover:bg-white/5 text-sm font-medium transition-colors border-t border-white/5 mt-1 pt-3"
+                            className={getMobileNavClass}
                         >
                             <PiHeart className="text-lg" />
                             <span>Wishlist</span>
-                        </Link>
+                        </NavLink>
                     </nav>
                 </div>
 
