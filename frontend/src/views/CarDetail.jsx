@@ -179,7 +179,7 @@ export default function CarDetail() {
         {/* Back Button */}
         <div className="mb-6">
           <Link
-            to="/cars"
+            to="/catalog"
             className="inline-flex items-center gap-2 text-xs font-semibold text-gray-400 hover:text-white bg-[#141620] hover:bg-white/10 border border-white/10 px-4 py-2 rounded-full transition-all"
           >
             <PiArrowLeft className="text-sm" />
@@ -213,6 +213,7 @@ export default function CarDetail() {
               price={formatRupiah(currentCar.basePrice)}
               priceNote="*Estimated OTR Jakarta. Monthly installments available."
               quickSpecs={quickSpecs}
+              isTopProduct={currentCar.isTopProduct}
             />
 
             <CarTabs

@@ -1,17 +1,32 @@
 import { PiSparkle } from "react-icons/pi";
 
-export default function CarInfo({ category, brand, year, name, price, priceNote, quickSpecs }) {
+export default function CarInfo({
+   category,
+   brand,
+   year,
+   name,
+   price,
+   priceNote,
+   quickSpecs,
+   isTopProduct,
+}) {
    return (
       <div className="space-y-5">
+         {/* Header */}
          <div>
             <div className="flex items-center gap-2 mb-2">
                <span className="text-[10px] font-bold uppercase tracking-wider bg-blue-500/10 border border-blue-500/25 text-blue-400 px-3 py-1 rounded-full">
                   {category}
                </span>
-               <span className="text-[10px] font-bold uppercase tracking-wider bg-amber-500/10 border border-amber-500/25 text-amber-400 px-3 py-1 rounded-full flex items-center gap-1">
-                  <PiSparkle className="text-xs" /> Top Product
-               </span>
+
+               {/* Top Product Badge */}
+               {isTopProduct && (
+                  <span className="text-[10px] font-bold uppercase tracking-wider bg-amber-500/10 border border-amber-500/25 text-amber-400 px-3 py-1 rounded-full flex items-center gap-1">
+                     <PiSparkle className="text-xs" /> Top Product
+                  </span>
+               )}
             </div>
+
             <p className="text-xs text-gray-400 font-semibold">{brand} · {year}</p>
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white mt-1 tracking-tight">
                {name}
@@ -24,7 +39,7 @@ export default function CarInfo({ category, brand, year, name, price, priceNote,
             </div>
          </div>
 
-         {/* Quick Specs Bento */}
+         {/* Quick Specs */}
          <div className="grid grid-cols-3 gap-3 p-3.5 bg-[#141620]/80 border border-white/10 rounded-2xl">
             {quickSpecs.map((spec, i) => (
                <div key={i} className="flex flex-col items-center text-center p-2">

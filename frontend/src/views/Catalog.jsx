@@ -1,7 +1,7 @@
 import { useState } from "react";
 import CarCard from "../components/catalog/CarCard";
 
-// Manual Data
+// Dummy Data
 const DUMMY_CARS = [
    {
       id: "honda-brio-rs",
@@ -48,25 +48,28 @@ const DUMMY_CARS = [
 ];
 
 export default function Catalog() {
-   const [selectedBrand, setSelectedBrand] = useState("All");
+   const [selectedType, setSelectedType] = useState("All");
 
-   const filteredCars = selectedBrand === "All"
+   const types = ["All", "Hatchback", "MPV", "SUV"];
+
+   // Filter by Type
+   const filteredCars = selectedType === "All"
       ? DUMMY_CARS
-      : DUMMY_CARS.filter((c) => c.brand === selectedBrand);
+      : DUMMY_CARS.filter((c) => c.type.toLowerCase() === selectedType.toLowerCase());
 
    return (
-      <div className="min-h-screen bg-[#0C0E16] text-white py-10 lg:py-16 relative overflow-hidden">
+      <div className="min-h-screen bg-[#0C0E16] text-white py-8 sm:py-12 lg:py-16 relative overflow-hidden">
          <div className="absolute top-1/3 right-1/4 w-[450px] h-[350px] bg-blue-600/10 blur-[150px] rounded-full pointer-events-none" />
 
          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 relative z-10">
 
             {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 pb-6 border-b border-white/10">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-5 mb-8 pb-6 border-b border-white/10">
                <div>
-                  <span className="text-gray-400 text-xs font-semibold tracking-widest uppercase">
+                  <span className="text-gray-400 text-[11px] font-semibold tracking-widest uppercase">
                      VEHICLE SHOWCASE
                   </span>
-                  <h1 className="text-3xl sm:text-4xl font-extrabold text-white mt-1">
+                  <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white mt-1">
                      Explore Car Catalog
                   </h1>
                   <p className="text-gray-400 text-xs sm:text-sm mt-1">
@@ -74,20 +77,22 @@ export default function Catalog() {
                   </p>
                </div>
 
-               {/* Brand Filter */}
-               <div className="flex items-center gap-1 bg-[#141620] p-1 rounded-full border border-white/10">
-                  {["All", "Honda", "Toyota"].map((brand) => (
-                     <button
-                        key={brand}
-                        onClick={() => setSelectedBrand(brand)}
-                        className={`text-xs font-semibold px-4 py-1.5 rounded-full transition-all cursor-pointer ${selectedBrand === brand
-                              ? "bg-blue-600 text-white shadow-sm"
-                              : "text-gray-400 hover:text-white"
-                           }`}
-                     >
-                        {brand}
-                     </button>
-                  ))}
+               {/* Type Filter (Mobile Scrollable) */}
+               <div className="w-full md:w-auto overflow-x-auto pb-1 md:pb-0 scrollbar-none">
+                  <div className="flex items-center gap-1 bg-[#141620] p-1 rounded-full border border-white/10 w-max">
+                     {types.map((type) => (
+                        <button
+                           key={type}
+                           onClick={() => setSelectedType(type)}
+                           className={`text-xs font-semibold px-3.5 py-1.5 rounded-full transition-all cursor-pointer whitespace-nowrap ${selectedType === type
+                                 ? "bg-blue-600 text-white shadow-sm"
+                                 : "text-gray-400 hover:text-white"
+                              }`}
+                        >
+                           {type}
+                        </button>
+                     ))}
+                  </div>
                </div>
             </div>
 

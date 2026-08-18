@@ -57,13 +57,13 @@ export default function Product360() {
               FEATURED HIGHLIGHTS
             </span>
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white mt-1 tracking-tight">
-              Interactive 360° — <span className="text-blue-500">SHK 8000</span>
+              Interactive 360° — <span className="text-blue-500">SHK</span>
             </h2>
           </div>
 
           {/* CTA to Catalog */}
           <Link
-            to="/cars"
+            to="/catalog"
             className="flex items-center gap-1.5 self-start sm:self-auto bg-[#141620] hover:bg-white/10 border border-white/15 text-gray-200 hover:text-white text-xs font-medium px-5 py-2.5 rounded-full transition-all cursor-pointer"
           >
             <span>Explore All Catalog</span>
@@ -78,7 +78,7 @@ export default function Product360() {
           <div className="lg:col-span-8 bg-[#141620]/70 border border-white/10 rounded-xl p-6 sm:p-10 shadow-2xl relative">
             <div className="w-full flex justify-center items-center py-4 cursor-grab active:cursor-grabbing min-h-[260px] sm:min-h-[320px]">
 
-              {/* CI360 Canvas dengan Dynamic Filter */}
+              {/* CI360 with color filter */}
               <div
                 className="cloudimage-360 w-full max-w-[560px] transition-all duration-500"
                 style={{ filter: selectedColor.filter }}
@@ -114,7 +114,7 @@ export default function Product360() {
                 {selectedColor.name}
               </h3>
               <p className="text-gray-400 text-xs sm:text-sm mt-2 leading-relaxed">
-                Switch body colors instantly and rotate the vehicle in 360° without visiting a showroom. Lightweight, pure image sequence — built for speed.
+                Switch body colors instantly and rotate the vehicle in 360° without visiting a showroom. Lightweight, pure image sequence built for speed.
               </p>
             </div>
 
