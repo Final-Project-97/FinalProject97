@@ -24,15 +24,13 @@ export default function CarActions({ carId, tags }) {
                <span>Credit Plan</span>
             </Link>
 
-            <button
-               type="button"
-               data-action="find-showroom"
-               data-car-id={carId}
+            <Link
+               to="/showrooms"
                className="flex items-center justify-center gap-2 bg-[#141620] hover:bg-white/10 border border-white/15 text-gray-200 hover:text-white text-xs font-semibold py-3 px-4 rounded-full transition-all cursor-pointer"
             >
                <PiMapPin className="text-base text-emerald-400" />
                <span>Find Showroom</span>
-            </button>
+            </Link>
          </div>
 
          {/* Tags */}

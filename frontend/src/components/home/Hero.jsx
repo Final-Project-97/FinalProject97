@@ -1,4 +1,5 @@
-import { PiSparkle, PiStarFill, PiCheckCircleFill } from "react-icons/pi";
+import { Link } from "react-router";
+import { PiSparkle, PiStarFill, PiCheckCircleFill, PiMapPin } from "react-icons/pi";
 import scrollIcon from "../../assets/Simple Scroll Down Icon.svg";
 
 export default function Hero() {
@@ -38,6 +39,14 @@ export default function Hero() {
                                 <span className="font-bold text-white">4.9/5</span> from 10,000+ happy car buyers
                             </p>
                         </div>
+
+                        <Link
+                            to="/showrooms"
+                            className="mt-6 inline-flex w-fit items-center gap-2 rounded-full border border-white/15 bg-white/5 px-5 py-3 text-xs font-semibold text-gray-200 transition-all hover:border-blue-500/40 hover:bg-blue-500/10 hover:text-white"
+                        >
+                            <PiMapPin className="text-base text-emerald-400" />
+                            Find Nearby Showrooms
+                        </Link>
                     </div>
 
                     {/* Right Column */}
