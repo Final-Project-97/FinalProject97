@@ -13,6 +13,7 @@ jest.unstable_mockModule('../../src/ai/catalog.helper.js', () => ({
   getActiveCars: mockGetActiveCars,
   formatCarLine: (c) => c.name,
   formatCarSummaryLine: (c) => c.name,
+  formatCarChatCatalogLine: (c) => c.name,
   parseJsonFromLlm: (s) => JSON.parse(s),
 }));
 
@@ -45,6 +46,106 @@ describe('ai controller', () => {
     await handleAIChat(mockReq({ ...aiReq, body: { message: 'Halo' } }), res);
     expect(getStatus(res)).toBe(200);
     expect(getJson(res).data.reply).toBe('Jawaban AI');
+    expect(getJson(res).data.replyType).toBe('text');
+  });
+
+  it('handleAIChat 200 recommendations JSON', async () => {
+    const car = {
+      _id: '1',
+      slug: 'avanza',
+      name: 'Avanza',
+      brand: 'Toyota',
+      type: 'MPV',
+      basePrice: 250000000,
+      thumbnailUrl: 'https://img.test/a.png',
+    };
+    mockGetActiveCars.mockResolvedValue([car]);
+    mockInvokeGroq.mockResolvedValue({
+      content: JSON.stringify({
+        replyType: 'recommendations',
+        reply: 'Here are some options:',
+        items: [{
+          carId: '1',
+          slug: 'avanza',
+          name: 'Avanza',
+          brand: 'Toyota',
+          basePrice: 250000000,
+          type: 'MPV',
+          aiReason: 'Good family car',
+        }],
+      }),
+    });
+
+    const res = mockRes();
+    await handleAIChat(mockReq({ ...aiReq, body: { message: 'Recommend family cars' } }), res);
+
+    const data = getJson(res).data;
+    expect(getStatus(res)).toBe(200);
+    expect(data.replyType).toBe('recommendations');
+    expect(data.items).toHaveLength(1);
+    expect(data.items[0].slug).toBe('avanza');
+  });
+
+  it('handleAIChat filters invalid recommendation items', async () => {
+    mockGetActiveCars.mockResolvedValue([{
+      _id: '1',
+      slug: 'avanza',
+      name: 'Avanza',
+      brand: 'Toyota',
+      type: 'MPV',
+      basePrice: 1,
+    }]);
+    mockInvokeGroq.mockResolvedValue({
+      content: JSON.stringify({
+        replyType: 'recommendations',
+        reply: 'Try these:',
+        items: [
+          { carId: '999', slug: 'fake', aiReason: 'x' },
+          { carId: '1', slug: 'wrong-slug', aiReason: 'x' },
+        ],
+      }),
+    });
+
+    const res = mockRes();
+    await handleAIChat(mockReq({ ...aiReq, body: { message: 'Recommend cars' } }), res);
+
+    const data = getJson(res).data;
+    expect(getStatus(res)).toBe(200);
+    expect(data.replyType).toBe('text');
+    expect(data.items).toBeNull();
+  });
+
+  it('handleAIChat 200 parsed text JSON', async () => {
+    mockGetActiveCars.mockResolvedValue([]);
+    mockInvokeGroq.mockResolvedValue({
+      content: JSON.stringify({ reply: 'Plain answer from JSON' }),
+    });
+
+    const res = mockRes();
+    await handleAIChat(mockReq({ ...aiReq, body: { message: 'Hello' } }), res);
+
+    expect(getJson(res).data.replyType).toBe('text');
+    expect(getJson(res).data.reply).toBe('Plain answer from JSON');
+  });
+
+  it('handleAIChat premium returns unlimited tokens', async () => {
+    mockGetActiveCars.mockResolvedValue([]);
+    mockInvokeGroq.mockResolvedValue({ content: 'Hi' });
+
+    const res = mockRes();
+    await handleAIChat(mockReq({
+      user: { _id: 'u1' },
+      aiAccessType: 'premium',
+      body: { message: 'Hi' },
+    }), res);
+
+    expect(getJson(res).data.remainingTokens).toBe('unlimited');
+  });
+
+  it('handleAIChat 400 non-string message', async () => {
+    const res = mockRes();
+    await handleAIChat(mockReq({ ...aiReq, body: { message: 123 } }), res);
+    expect(getStatus(res)).toBe(400);
   });
 
   it('handleAIRecommend 400 without budget', async () => {
@@ -65,7 +166,9 @@ describe('ai controller', () => {
   });
 
   it('handleCreditSimulation 200', async () => {
-    mockInvokeGroq.mockResolvedValue({ content: '{"financialHealthStatus":"Aman","insightText":"OK"}' });
+    mockInvokeGroq.mockResolvedValue({
+      content: '{"financialHealthStatus":"Aman","insightText":"OK"}',
+    });
     const res = mockRes();
     await handleCreditSimulation(mockReq({
       ...aiReq,
@@ -84,6 +187,12 @@ describe('ai controller', () => {
     expect(getStatus(res)).toBe(400);
   });
 
+  it('handleCreditSimulation 400 missing required fields', async () => {
+    const res = mockRes();
+    await handleCreditSimulation(mockReq({ ...aiReq, body: { carPrice: 100 } }), res);
+    expect(getStatus(res)).toBe(400);
+  });
+
   it('handleAIRecommend 404 empty catalog', async () => {
     mockGetActiveCars.mockResolvedValue([]);
     const res = mockRes();
@@ -98,6 +207,7 @@ describe('ai controller', () => {
       getActiveCars: mockGetActiveCars,
       formatCarLine: (c) => c.name,
       formatCarSummaryLine: (c) => c.name,
+      formatCarChatCatalogLine: (c) => c.name,
       parseJsonFromLlm: () => { throw new Error('parse fail'); },
     }));
     const { handleAIRecommend: recommend } = await import('../../src/controllers/ai.controller.js');
