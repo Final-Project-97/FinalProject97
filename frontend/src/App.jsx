@@ -10,6 +10,10 @@ import AuthProvider from "./context/AuthContext";
 import ShowroomProvider from "./context/ShowroomContext";
 import Showrooms from "./views/Showrooms";
 import Credit from "./views/Credit";
+import Wishlist from "./views/Wishlist";
+import ProtectedRoute from "./components/shared/ProtectedRoute";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   return (
@@ -46,6 +50,14 @@ function App() {
                 <Credit />
               }
             />
+            <Route
+              path="/wishlist"
+              element={
+                <ProtectedRoute>
+                  <Wishlist />
+                </ProtectedRoute>
+              }
+            />
             {/* Placeholder routes for Brian */}
             {/* <Route path="/credit" element={<Credit />} /> */}
             {/* <Route path="/profile" element={<Profile />} /> */}
@@ -53,6 +65,7 @@ function App() {
         </Routes>
         </AuthProvider>
       </BrowserRouter>
+      <ToastContainer position="top-right" theme="dark" />
     </>
   )
 }

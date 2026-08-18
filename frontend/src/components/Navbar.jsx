@@ -66,9 +66,9 @@ export default function Navbar() {
 
                         {/* Actions */}
                         <div className="flex items-center gap-3">
-                            <button className="btn btn-ghost btn-circle btn-sm text-gray-300 hover:text-white hover:bg-white/10" aria-label="Wishlist">
+                            <Link to="/wishlist" className="btn btn-ghost btn-circle btn-sm text-gray-300 hover:text-white hover:bg-white/10" aria-label="Wishlist">
                                 <PiHeart className="text-xl" />
-                            </button>
+                            </Link>
                             <Link to="/login" className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-4 py-2 rounded-full transition-all shadow-md shadow-blue-500/25">
                                 <PiUser className="text-sm" />
                                 <span>Sign In</span>

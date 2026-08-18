@@ -185,16 +185,32 @@ export async function getMockResponse(path, options = {}) {
   }
 
   if (pathname === "/api/wishlist" && method === "POST") {
-    const item = { _id: `mock-wishlist-${Date.now()}`, ...body };
+    if (mockWishlist.some((item) => item.carId === body.carId)) {
+      const error = new Error("This car is already in your wishlist");
+      error.status = 409;
+      throw error;
+    }
+
+    const item = {
+      _id: `mock-wishlist-${Date.now()}`,
+      ...body,
+      car: findCar(body.carId) || null,
+    };
     mockWishlist.push(item);
     return clone({ success: true, data: item });
   }
 
   if (pathname.startsWith("/api/wishlist/") && method === "PUT") {
-    return clone({ success: true, data: body });
+    const id = pathname.replace("/api/wishlist/", "");
+    const index = mockWishlist.findIndex((item) => item._id === id);
+    if (index >= 0) mockWishlist[index] = { ...mockWishlist[index], ...body };
+    return clone({ success: true, data: mockWishlist[index] || body });
   }
 
   if (pathname.startsWith("/api/wishlist/") && method === "DELETE") {
+    const id = pathname.replace("/api/wishlist/", "");
+    const index = mockWishlist.findIndex((item) => item._id === id);
+    if (index >= 0) mockWishlist.splice(index, 1);
     return { success: true, message: "Wishlist deleted" };
   }
 

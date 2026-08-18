@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { Link } from "react-router";
-import { PiArrowRight, PiLightning, PiQuestion } from "react-icons/pi";
+import { PiArrowRight, PiHeart, PiLightning, PiQuestion } from "react-icons/pi";
+import { toast } from "react-toastify";
 import { getRecommendations } from "../api/ai";
 import { getCarById } from "../api/cars";
+import { addWishlist } from "../api/wishlist";
 import useAuth from "../context/useAuth";
 import useShowrooms from "../context/useShowrooms";
 import "./Recommend.css";
@@ -61,6 +63,30 @@ function Recommend() {
 
   function updateForm(name, value) {
     setForm((currentForm) => ({ ...currentForm, [name]: value }));
+  }
+
+  async function handleAddWishlist(recommendation) {
+    if (!isAuthenticated) {
+      toast.error("Please sign in before adding a car to your wishlist.");
+      return;
+    }
+
+    try {
+      await addWishlist({
+        carId: recommendation.carId,
+        selectedColor: recommendation.selectedColor || form.selectedColor || undefined,
+        source: "recommendation",
+        matchScore: recommendation.matchScore,
+        aiReason: recommendation.aiReason,
+      });
+      toast.success("Recommendation added to your wishlist.");
+    } catch (wishlistError) {
+      toast.error(
+        wishlistError.status === 409
+          ? "This car is already in your wishlist."
+          : wishlistError.message,
+      );
+    }
   }
 
   async function handleSubmit(event) {
@@ -387,6 +413,14 @@ function Recommend() {
                           )}
                         </div>
                         <div className="flex gap-3 text-sm">
+                          <button
+                            aria-label={`Add ${car?.name || "car"} to wishlist`}
+                            className="inline-flex items-center gap-1 text-pink-400 hover:text-pink-300"
+                            onClick={() => handleAddWishlist(recommendation)}
+                            type="button"
+                          >
+                            <PiHeart /> Wishlist
+                          </button>
                           <Link className="text-blue-400 hover:text-blue-300" to={`/cars/${recommendation.carId}`}>
                             Details
                           </Link>
