@@ -66,7 +66,16 @@ function App() {
           </Routes>
         </AuthProvider>
       </BrowserRouter>
-      <ToastContainer position="top-right" theme="dark" />
+      <ToastContainer
+        autoClose={3500}
+        closeOnClick
+        newestOnTop
+        pauseOnFocusLoss
+        position="top-right"
+        progressClassName="rac-toast-progress"
+        theme="dark"
+        toastClassName="rac-toast"
+      />
     </>
   );
 }

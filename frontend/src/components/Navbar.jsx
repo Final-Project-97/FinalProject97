@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { Link, NavLink } from "react-router";
+import Swal from "sweetalert2";
+import { toast } from "react-toastify";
 import racLogo from "../assets/RAC-Logo 1.png";
 import useAuth from "../context/useAuth";
 import {
@@ -68,6 +70,36 @@ export default function Navbar() {
     function openSidebar() {
         setIsProfileOpen(false);
         setIsOpen(true);
+    }
+
+    async function handleSignOut() {
+        const confirmation = await Swal.fire({
+            title: "Sign out of RAC?",
+            text: "You will need to sign in again to access your wishlist and Premium features.",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonText: "Sign Out",
+            cancelButtonText: "Stay Signed In",
+            confirmButtonColor: "#ef4444",
+            cancelButtonColor: "#252936",
+            background: "#141720",
+            color: "#f8fafc",
+            iconColor: "#60a5fa",
+            reverseButtons: true,
+            scrollbarPadding: false,
+            customClass: {
+                popup: "rac-swal-popup",
+                confirmButton: "rac-swal-button",
+                cancelButton: "rac-swal-button",
+            },
+        });
+
+        if (!confirmation.isConfirmed) return;
+
+        setIsProfileOpen(false);
+        setIsOpen(false);
+        await signOut();
+        toast.success("You have been signed out.");
     }
 
     return (
@@ -193,10 +225,7 @@ export default function Navbar() {
                                                     )}
 
                                                     <button
-                                                        onClick={() => {
-                                                            setIsProfileOpen(false);
-                                                            signOut();
-                                                        }}
+                                                        onClick={handleSignOut}
                                                         className="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-red-400 hover:bg-red-500/10 rounded-xl transition-colors w-full text-left cursor-pointer border-t border-white/5 mt-1 pt-2"
                                                     >
                                                         <PiSignOut className="text-base" />
@@ -351,10 +380,7 @@ export default function Navbar() {
                 <div className="pt-6 border-t border-white/10">
                     {isAuthenticated ? (
                         <button
-                            onClick={() => {
-                                setIsOpen(false);
-                                signOut();
-                            }}
+                            onClick={handleSignOut}
                             className="flex items-center justify-center gap-2 w-full bg-red-600/10 hover:bg-red-600/20 text-red-400 text-sm font-semibold py-3 rounded-full border border-red-500/20 transition-all cursor-pointer"
                         >
                             <PiSignOut className="text-base" />

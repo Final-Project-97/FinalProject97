@@ -14,3 +14,79 @@ body {
   touch-action: pan-y;
   /* Mencegah gesture geser samping yang tidak diinginkan */
 }
+
+.Toastify__toast-container {
+  width: min(390px, calc(100vw - 32px));
+}
+
+.Toastify__toast.rac-toast {
+  min-height: 64px;
+  border: 1px solid rgb(96 165 250 / 24%);
+  border-radius: 16px;
+  background: rgb(20 23 32 / 96%);
+  color: #e2e8f0;
+  box-shadow: 0 20px 45px rgb(0 0 0 / 38%);
+  backdrop-filter: blur(16px);
+}
+
+.Toastify__toast.rac-toast .Toastify__toast-icon {
+  color: #60a5fa;
+}
+
+.Toastify__toast--success.rac-toast {
+  border-color: rgb(52 211 153 / 28%);
+}
+
+.Toastify__toast--success.rac-toast .Toastify__toast-icon {
+  color: #34d399;
+}
+
+.Toastify__toast--error.rac-toast {
+  border-color: rgb(248 113 113 / 30%);
+}
+
+.Toastify__toast--error.rac-toast .Toastify__toast-icon {
+  color: #f87171;
+}
+
+.Toastify__toast--warning.rac-toast {
+  border-color: rgb(251 191 36 / 30%);
+}
+
+.Toastify__toast--warning.rac-toast .Toastify__toast-icon {
+  color: #fbbf24;
+}
+
+.Toastify__toast.rac-toast .Toastify__close-button {
+  color: #94a3b8;
+  opacity: 1;
+}
+
+.Toastify__progress-bar.rac-toast-progress {
+  background: linear-gradient(90deg, #3b82f6, #6366f1);
+}
+
+.rac-swal-popup {
+  border: 1px solid rgb(96 165 250 / 22%);
+  border-radius: 24px;
+  box-shadow: 0 24px 70px rgb(0 0 0 / 48%);
+}
+
+.rac-swal-button {
+  min-height: 44px;
+  border-radius: 999px !important;
+  padding-inline: 22px !important;
+}
+
+@media (max-width: 480px) {
+  .Toastify__toast-container {
+    top: 12px;
+    right: 16px;
+    left: 16px;
+    width: auto;
+  }
+
+  .Toastify__toast.rac-toast {
+    margin-bottom: 10px;
+  }
+}
