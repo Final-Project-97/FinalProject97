@@ -13,18 +13,36 @@ import {
     PiCar,
     PiSignOut,
     PiCaretDown,
-    PiLightning
+    PiLightning,
+    PiCrown
 } from "react-icons/pi";
 
 export default function Navbar() {
-    const { user, isAuthenticated, signOut } = useAuth();
+    const { user, subscription, isAuthenticated, signOut } = useAuth();
     const [isOpen, setIsOpen] = useState(false);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
 
     // Google Avatar & DiceBear Fallback
     const avatarUrl = user?.avatar || user?.picture || `https://api.dicebear.com/10.x/weave/svg?seed=${encodeURIComponent(user?.name || user?.email || "User")}`;
-    const userPlan = user?.plan || "free";
+
+    // Fixed: check all possible premium indicators from /me and /subscription/status
+    const isPremium = Boolean(
+        subscription?.premiumActive ||
+        subscription?.status === "active" ||
+        subscription?.paymentStatus === "success" ||
+        user?.isPremium ||
+        user?.plan === "premium" ||
+        user?.tier === "premium"
+    );
     const remainingTokens = user?.aiTokensRemaining ?? 5;
+
+    // Format expiry date for premium users
+    function formatExpiry() {
+        const expiresAt = subscription?.expiresAt;
+        if (!expiresAt) return null;
+        const date = new Date(expiresAt);
+        return date.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+    }
 
     // Desktop NavLink Style
     const getDesktopNavClass = ({ isActive }) =>
@@ -40,6 +58,18 @@ export default function Navbar() {
             : "text-gray-300 hover:text-white hover:bg-white/5"
         }`;
 
+    // Close sidebar when opening dropdown
+    function toggleProfile() {
+        setIsOpen(false);
+        setIsProfileOpen(!isProfileOpen);
+    }
+
+    // Close dropdown when opening sidebar
+    function openSidebar() {
+        setIsProfileOpen(false);
+        setIsOpen(true);
+    }
+
     return (
         <>
             <header className="sticky top-0 z-30 w-full bg-[#141620]/80 backdrop-blur-md border-b border-white/10">
@@ -50,7 +80,7 @@ export default function Navbar() {
                         {/* Logo */}
                         <div className="flex items-center gap-3">
                             <button
-                                onClick={() => setIsOpen(true)}
+                                onClick={openSidebar}
                                 className="btn btn-ghost btn-circle btn-sm text-white lg:hidden"
                                 aria-label="Open Menu"
                             >
@@ -81,23 +111,23 @@ export default function Navbar() {
                         <div className="flex items-center gap-3">
                             {isAuthenticated ? (
                                 <>
-                                    {/* AI Token Badge */}
-                                    {userPlan === "free" ? (
+                                    {/* Badge: premium crown or token count */}
+                                    {isPremium ? (
+                                        <div className="hidden sm:flex items-center gap-1.5 bg-blue-600/15 border border-blue-500/30 text-blue-400 text-xs font-semibold px-3.5 py-1.5 rounded-full">
+                                            <PiCrown className="text-sm" />
+                                            <span>Premium</span>
+                                        </div>
+                                    ) : (
                                         <div className="hidden sm:flex items-center gap-1.5 bg-blue-600/10 border border-blue-500/25 text-blue-400 text-xs font-semibold px-3 py-1.5 rounded-full">
                                             <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
                                             <span>{remainingTokens} Tokens</span>
                                         </div>
-                                    ) : (
-                                        <div className="hidden sm:flex items-center gap-1.5 bg-amber-500/10 border border-amber-500/25 text-amber-400 text-xs font-semibold px-3 py-1.5 rounded-full">
-                                            <PiSparkle className="text-xs" />
-                                            <span>Premium Member</span>
-                                        </div>
                                     )}
 
-                                    {/* Profile Dropdown */}
-                                    <div className="relative">
+                                    {/* Profile Dropdown — desktop only */}
+                                    <div className="relative hidden sm:block">
                                         <button
-                                            onClick={() => setIsProfileOpen(!isProfileOpen)}
+                                            onClick={toggleProfile}
                                             className="flex items-center gap-2.5 bg-[#141620] hover:bg-white/10 border border-white/10 p-1.5 pr-3 rounded-full transition-all cursor-pointer"
                                         >
                                             <img
@@ -110,8 +140,8 @@ export default function Navbar() {
                                                 <span className="text-xs font-bold text-white leading-tight">
                                                     {user?.name || "User"}
                                                 </span>
-                                                <span className="text-[10px] text-gray-400 font-medium capitalize">
-                                                    {userPlan === "free" ? "Free Plan" : "Premium"}
+                                                <span className={`text-[10px] font-medium ${isPremium ? "text-blue-400 font-semibold" : "text-gray-400"}`}>
+                                                    {isPremium ? "Pro Plan" : "Free Plan"}
                                                 </span>
                                             </div>
                                             <PiCaretDown className={`text-xs text-gray-400 transition-transform ${isProfileOpen ? "rotate-180" : ""}`} />
@@ -125,11 +155,6 @@ export default function Navbar() {
                                                     className="fixed inset-0 z-40"
                                                 />
                                                 <div className="absolute right-0 mt-2 w-52 bg-[#0C0E16] border border-white/10 rounded-2xl p-2 shadow-2xl z-50 flex flex-col gap-1">
-                                                    <div className="px-3 py-2 border-b border-white/5 md:hidden">
-                                                        <p className="text-xs font-bold text-white">{user?.name || "User"}</p>
-                                                        <p className="text-[10px] text-blue-400 font-semibold">{remainingTokens} Tokens Remaining</p>
-                                                    </div>
-
                                                     <Link
                                                         to="/wishlist"
                                                         onClick={() => setIsProfileOpen(false)}
@@ -139,7 +164,24 @@ export default function Navbar() {
                                                         <span>My Wishlist</span>
                                                     </Link>
 
-                                                    {userPlan === "free" && (
+                                                    {/* Premium: show expiry — Free: show upgrade link */}
+                                                    {isPremium ? (
+                                                        <Link
+                                                            to="/upgrade"
+                                                            onClick={() => setIsProfileOpen(false)}
+                                                            className="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-blue-400 hover:bg-blue-600/10 rounded-xl transition-colors"
+                                                        >
+                                                            <PiCrown className="text-base" />
+                                                            <div className="flex flex-col">
+                                                                <span>Pro Plan</span>
+                                                                {formatExpiry() && (
+                                                                    <span className="text-[10px] text-gray-500 font-normal">
+                                                                        Expires {formatExpiry()}
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        </Link>
+                                                    ) : (
                                                         <Link
                                                             to="/upgrade"
                                                             onClick={() => setIsProfileOpen(false)}
@@ -164,6 +206,20 @@ export default function Navbar() {
                                             </>
                                         )}
                                     </div>
+
+                                    {/* Mobile avatar — opens sidebar */}
+                                    <button
+                                        onClick={openSidebar}
+                                        className="sm:hidden"
+                                        aria-label="Open Menu"
+                                    >
+                                        <img
+                                            src={avatarUrl}
+                                            alt={user?.name || "User"}
+                                            referrerPolicy="no-referrer"
+                                            className="w-8 h-8 rounded-full bg-blue-600 object-cover border-2 border-blue-500/40"
+                                        />
+                                    </button>
                                 </>
                             ) : (
                                 /* Sign In Button */
@@ -213,7 +269,20 @@ export default function Navbar() {
                             />
                             <div>
                                 <h4 className="text-xs font-bold text-white">{user?.name || "User"}</h4>
-                                <span className="text-[10px] text-blue-400 font-semibold">{remainingTokens} Tokens Remaining</span>
+                                {/* Show plan status and expiry or token count */}
+                                {isPremium ? (
+                                    <span className="text-[10px] text-blue-400 font-semibold flex items-center gap-1 mt-0.5">
+                                        <PiCrown className="text-xs" />
+                                        Pro Plan
+                                        {formatExpiry() && (
+                                            <span className="text-gray-500 font-normal ml-1">· exp {formatExpiry()}</span>
+                                        )}
+                                    </span>
+                                ) : (
+                                    <span className="text-[10px] text-blue-400 font-semibold">
+                                        {remainingTokens} Tokens Remaining
+                                    </span>
+                                )}
                             </div>
                         </div>
                     )}
@@ -232,7 +301,7 @@ export default function Navbar() {
                             onClick={() => setIsOpen(false)}
                             className={getMobileNavClass}
                         >
-                            <PiCar className="text-lg text-blue-400" />
+                            <PiCar className="text-lg" />
                             <span>Catalog</span>
                         </NavLink>
                         <NavLink
@@ -259,6 +328,23 @@ export default function Navbar() {
                             <PiHeart className="text-lg" />
                             <span>Wishlist</span>
                         </NavLink>
+
+                        {/* Sidebar: upgrade link for free users only */}
+                        {isAuthenticated && !isPremium && (
+                            <NavLink
+                                to="/upgrade"
+                                onClick={() => setIsOpen(false)}
+                                className={({ isActive }) =>
+                                    `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${isActive
+                                        ? "bg-amber-500 text-white shadow-sm"
+                                        : "text-amber-400 hover:bg-amber-500/10"
+                                    }`
+                                }
+                            >
+                                <PiLightning className="text-lg" />
+                                <span>Upgrade to Premium</span>
+                            </NavLink>
+                        )}
                     </nav>
                 </div>
 
