@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router";
 import Home from "./views/Home";
 import BaseLayout from "./layout/BaseLayout";
 import Login from "./views/Login";
+import Register from "./views/Register";
 import CarDetail from "./views/CarDetail";
 import Catalog from "./views/Catalog";
 import Recommend from "./views/Recommend";
@@ -14,8 +15,10 @@ function App() {
   return (
     <>
       <BrowserRouter>
+        <AuthProvider>
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
 
           <Route element={<BaseLayout />}>
             <Route path="/" element={<Home />} />
@@ -24,11 +27,9 @@ function App() {
             <Route
               path="/recommendation"
               element={
-                <AuthProvider>
-                  <ShowroomProvider>
-                    <Recommend />
-                  </ShowroomProvider>
-                </AuthProvider>
+                <ShowroomProvider>
+                  <Recommend />
+                </ShowroomProvider>
               }
             />
             <Route
@@ -42,9 +43,7 @@ function App() {
             <Route
               path="/simulasi-kredit"
               element={
-                <AuthProvider>
-                  <Credit />
-                </AuthProvider>
+                <Credit />
               }
             />
             {/* Placeholder routes for Brian */}
@@ -52,6 +51,7 @@ function App() {
             {/* <Route path="/profile" element={<Profile />} /> */}
           </Route>
         </Routes>
+        </AuthProvider>
       </BrowserRouter>
     </>
   )

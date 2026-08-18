@@ -68,6 +68,30 @@ export async function getMockResponse(path, options = {}) {
     return clone({ success: true, token: "mock-access-token", user: mockUser });
   }
 
+  if (pathname === "/api/auth/login" && method === "POST") {
+    if (!body.email || !body.password) {
+      const error = new Error("Email and password are required");
+      error.status = 400;
+      throw error;
+    }
+
+    return clone({ success: true, token: "mock-access-token", user: mockUser });
+  }
+
+  if (pathname === "/api/auth/register" && method === "POST") {
+    if (!body.name || !body.email || !body.password) {
+      const error = new Error("Name, email, and password are required");
+      error.status = 400;
+      throw error;
+    }
+
+    return clone({
+      success: true,
+      token: "mock-access-token",
+      user: { ...mockUser, name: body.name, email: body.email },
+    });
+  }
+
   if (pathname === "/api/auth/me" && method === "GET") {
     return clone({
       success: true,

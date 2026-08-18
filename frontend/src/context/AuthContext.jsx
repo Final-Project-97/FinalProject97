@@ -1,5 +1,11 @@
 import { useEffect, useState } from "react";
-import { getCurrentUser, googleLogin, logoutUser } from "../api/auth";
+import {
+  emailLogin,
+  getCurrentUser,
+  googleLogin,
+  logoutUser,
+  registerWithEmail,
+} from "../api/auth";
 import { ACCESS_TOKEN_KEY } from "../api/client";
 import AuthContext from "./auth-context";
 
@@ -39,6 +45,18 @@ function AuthProvider({ children }) {
     setUser(result.user);
   }
 
+  async function signInWithEmail(email, password) {
+    const result = await emailLogin(email, password);
+    localStorage.setItem(ACCESS_TOKEN_KEY, result.token);
+    setUser(result.user);
+  }
+
+  async function signUpWithEmail(name, email, password) {
+    const result = await registerWithEmail(name, email, password);
+    localStorage.setItem(ACCESS_TOKEN_KEY, result.token);
+    setUser(result.user);
+  }
+
   async function signOut() {
     try {
       await logoutUser();
@@ -63,6 +81,8 @@ function AuthProvider({ children }) {
         isAuthenticated: Boolean(user),
         isLoading,
         signInWithGoogle,
+        signInWithEmail,
+        signUpWithEmail,
         signOut,
         refreshUser,
       }}
