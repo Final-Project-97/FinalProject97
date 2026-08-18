@@ -1,3 +1,5 @@
+import { jest } from '@jest/globals';
+
 export function chainMock(finalValue) {
   const chain = {
     where: jest.fn().mockReturnThis(),

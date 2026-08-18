@@ -1,3 +1,5 @@
+import { jest } from '@jest/globals';
+
 export function mockRes() {
   const res = {};
   res.status = jest.fn().mockReturnValue(res);

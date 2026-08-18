@@ -31,3 +31,4 @@ dist/
 
 atlas-credentials.env
 atlas-credentials.*
+coverage

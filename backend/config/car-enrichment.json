@@ -4,7 +4,7 @@
     "brand": "Honda",
     "type": "Hatchback",
     "basePrice": 263200000,
-    "description": "City car sporty paling laris di Indonesia, irit, lincah, dan resale value tinggi.",
+    "description": "Indonesia's best-selling sporty city hatchback. The 1.2L i-VTEC CVT delivers agile urban handling, strong fuel economy, and excellent resale value. RS trim adds a more aggressive look and premium cabin touches for daily commuting.",
     "specs": {
       "engine": "1.2L i-VTEC",
       "transmission": "CVT",
@@ -52,7 +52,7 @@
     "brand": "Honda",
     "type": "Hatchback",
     "basePrice": 170400000,
-    "description": "Entry LCGC Honda dengan OTR Jakarta paling terjangkau dan biaya operasional rendah.",
+    "description": "Honda's most affordable LCGC entry with the lowest OTR in its class for Jakarta. Ideal for first-time buyers who need low running costs, easy maintenance, and a practical 5-seat cabin for city driving.",
     "specs": {
       "engine": "1.2L i-VTEC",
       "transmission": "Manual",
@@ -93,7 +93,7 @@
     "brand": "Honda",
     "type": "SUV",
     "basePrice": 285100000,
-    "description": "Compact SUV Honda dengan ground clearance tinggi, cocok untuk keluarga urban.",
+    "description": "Compact Honda SUV with elevated ground clearance for Indonesian roads. The 1.5L CVT setup balances comfort and efficiency, making it a smart choice for small families and urban adventure.",
     "specs": {
       "engine": "1.5L DOHC i-VTEC",
       "transmission": "CVT",
@@ -116,7 +116,7 @@
     "brand": "Honda",
     "type": "SUV",
     "basePrice": 298600000,
-    "description": "WR-V tipe RS dengan velg sport dan aksen hitam yang lebih agresif.",
+    "description": "Sportier WR-V RS variant with black-accent styling and larger alloy wheels. Same reliable 1.5L CVT powertrain with a more dynamic street presence for buyers who want SUV practicality with RS character.",
     "specs": {
       "engine": "1.5L DOHC i-VTEC",
       "transmission": "CVT",
@@ -139,7 +139,7 @@
     "brand": "Honda",
     "type": "SUV",
     "basePrice": 322100000,
-    "description": "WR-V RS lengkap dengan Honda SENSING untuk bantuan keselamatan aktif.",
+    "description": "Top WR-V RS grade equipped with Honda SENSING active safety suite (collision mitigation, lane support, adaptive features). Best for safety-conscious drivers who want compact SUV size with advanced driver assistance.",
     "specs": {
       "engine": "1.5L DOHC i-VTEC",
       "transmission": "CVT",
@@ -162,7 +162,7 @@
     "brand": "Honda",
     "type": "SUV",
     "basePrice": 388600000,
-    "description": "Compact SUV coupe Honda dengan Honda SENSING dan desain futuristik.",
+    "description": "Coupe-styled compact SUV with futuristic design and Honda SENSING on select grades. TNGA-inspired chassis offers a refined ride, modern tech, and strong brand prestige in the 5-seat SUV segment.",
     "specs": {
       "engine": "1.5L DOHC i-VTEC",
       "transmission": "CVT",
@@ -185,7 +185,7 @@
     "brand": "Honda",
     "type": "SUV",
     "basePrice": 410700000,
-    "description": "HR-V E+ dengan velg 18 inci, audio 8 inci, dan Hands-Free Power Tailgate.",
+    "description": "Mid-grade HR-V with 18-inch wheels, 8-inch audio display, and hands-free power tailgate. Adds daily convenience and premium feel over the base E without stepping up to hybrid pricing.",
     "specs": {
       "engine": "1.5L DOHC i-VTEC",
       "transmission": "CVT",
@@ -208,7 +208,7 @@
     "brand": "Honda",
     "type": "SUV",
     "basePrice": 450000000,
-    "description": "HR-V hybrid e:HEV, irit BBM dengan tenaga motor listrik yang responsif.",
+    "description": "HR-V hybrid e:HEV pairs a 1.5L engine with electric motor assist for smoother acceleration and lower fuel use in traffic. Ideal for urban commuters who want SUV space with hybrid efficiency.",
     "specs": {
       "engine": "1.5L i-VTEC + e:HEV",
       "transmission": "e-CVT",
@@ -231,7 +231,7 @@
     "brand": "Honda",
     "type": "SUV",
     "basePrice": 489000000,
-    "description": "Tipe tertinggi HR-V hybrid dengan aero kit RS dan panoramic glass roof.",
+    "description": "Flagship HR-V RS e:HEV with aero kit, panoramic glass roof, and full hybrid drivetrain. Targets buyers wanting maximum style, tech, and fuel savings in Honda's compact SUV lineup.",
     "specs": {
       "engine": "1.5L i-VTEC + e:HEV",
       "transmission": "e-CVT",
@@ -254,7 +254,7 @@
     "brand": "Honda",
     "type": "SUV",
     "basePrice": 330700000,
-    "description": "SUV 7-seater keluarga dengan kabin lapang dan ground clearance tinggi.",
+    "description": "7-seat family SUV with spacious third row and high ground clearance for MPV-like practicality in an SUV body. N7X styling and 1.5L CVT make it a strong choice for growing families on a mid-range budget.",
     "specs": {
       "engine": "1.5L DOHC i-VTEC",
       "transmission": "CVT",
@@ -277,7 +277,7 @@
     "brand": "Honda",
     "type": "SUV",
     "basePrice": 356200000,
-    "description": "BR-V Prestige dengan kelengkapan fitur lebih lengkap untuk keluarga.",
+    "description": "Premium BR-V Prestige trim with enhanced interior features and N7X design language. Delivers more comfort and equipment than base BR-V while keeping the same versatile 7-seat layout.",
     "specs": {
       "engine": "1.5L DOHC i-VTEC",
       "transmission": "CVT",
@@ -300,7 +300,7 @@
     "brand": "Honda",
     "type": "SUV",
     "basePrice": 777000000,
-    "description": "Flagship SUV hybrid Honda di Indonesia, kabin lapang dan irit untuk touring.",
+    "description": "Honda's flagship hybrid SUV in Indonesia with a spacious 7-seat cabin and 2.0L e:HEV system. Built for long-distance touring, premium family travel, and lower fuel costs on highway trips.",
     "specs": {
       "engine": "2.0L i-VTEC + e:HEV",
       "transmission": "e-CVT",
@@ -323,7 +323,7 @@
     "brand": "Honda",
     "type": "SUV",
     "basePrice": 827800000,
-    "description": "CR-V RS e:HEV dengan paket sport RS dan fitur keselamatan terlengkap.",
+    "description": "Range-topping CR-V RS e:HEV with sport RS body kit and comprehensive safety and comfort features. For buyers who want maximum hybrid SUV capability with executive-level presence.",
     "specs": {
       "engine": "2.0L i-VTEC + e:HEV",
       "transmission": "e-CVT",
@@ -346,7 +346,7 @@
     "brand": "Honda",
     "type": "Hatchback",
     "basePrice": 384500000,
-    "description": "Hatchback premium dengan Ultra Seat, kabin senyap, dan Honda SENSING.",
+    "description": "Premium hatchback with Honda's Ultra Seat flexibility, quiet cabin, and Honda SENSING. RS trim adds sporty styling; excellent for urban professionals who want sedan comfort in a compact footprint.",
     "specs": {
       "engine": "1.5L DOHC i-VTEC",
       "transmission": "CVT",
@@ -399,7 +399,7 @@
     "brand": "Honda",
     "type": "Sedan",
     "basePrice": 402000000,
-    "description": "Sedan kompak Honda dengan kabin lapang dan efisiensi bahan bakar baik.",
+    "description": "Compact Honda sedan with class-leading rear legroom and efficient 1.5L CVT. A balanced daily driver for small families and office commuters who prefer sedan comfort over SUV height.",
     "specs": {
       "engine": "1.5L DOHC i-VTEC",
       "transmission": "CVT",
@@ -434,7 +434,7 @@
     "brand": "Honda",
     "type": "Sedan",
     "basePrice": 970900000,
-    "description": "Sedan eksekutif hybrid Honda dengan tenaga sistem 204 PS dan kabin mewah.",
+    "description": "Executive hybrid sedan delivering 204 PS system output with e:HEV technology. Luxurious cabin, smooth highway manners, and low running costs for business users and premium sedan buyers.",
     "specs": {
       "engine": "2.0L i-VTEC + e:HEV",
       "transmission": "e-CVT",
@@ -469,7 +469,7 @@
     "brand": "Honda",
     "type": "Hatchback",
     "basePrice": 1445500000,
-    "description": "Hot hatch ikonik Honda dengan transmisi manual 6 percepatan dan downforce tinggi.",
+    "description": "Iconic Honda hot hatch with 2.0L VTEC Turbo and 6-speed manual. Track-capable chassis, aggressive aero, and limited production appeal for enthusiasts who prioritize driving engagement.",
     "specs": {
       "engine": "2.0L VTEC Turbo",
       "transmission": "Manual 6-speed",
@@ -516,7 +516,7 @@
     "brand": "Honda",
     "type": "SUV",
     "basePrice": 859000000,
-    "description": "SUV listrik murni Honda berbasis e:N Architecture dengan jarak tempuh sekitar 500 km.",
+    "description": "Honda's pure-electric SUV on e:N Architecture with ~500 km claimed range. Zero tailpipe emissions, instant torque, and modern EV tech for early adopters ready to switch from gasoline.",
     "specs": {
       "engine": "Electric Motor 201 hp / 68.8 kWh",
       "transmission": "Automatic",
@@ -545,7 +545,7 @@
     "brand": "Toyota",
     "type": "MPV",
     "basePrice": 282100000,
-    "description": "MPV 7-seater sejuta umat dengan DNGA, irit, dan mudah dirawat di seluruh Indonesia.",
+    "description": "Indonesia's benchmark 7-seat MPV on the DNGA platform. Known for low maintenance costs, wide service network, strong resale value, and practical family mobility across urban and rural roads.",
     "specs": {
       "engine": "1.5L 2NR-VE",
       "transmission": "CVT",
@@ -592,7 +592,7 @@
     "brand": "Toyota",
     "type": "SUV",
     "basePrice": 277800000,
-    "description": "Compact SUV turbo 1.0L yang gesit di kota dengan opsi dua-tone sporty.",
+    "description": "Compact turbocharged SUV (1.0T) with nimble city handling and bold two-tone color options. Great for young buyers who want SUV styling and peppy performance without full-size SUV running costs.",
     "specs": {
       "engine": "1.0L Turbo 1KR-VET",
       "transmission": "Automatic",
@@ -651,7 +651,7 @@
     "brand": "Toyota",
     "type": "SUV",
     "basePrice": 301100000,
-    "description": "SUV 7-seater tangguh dengan ground clearance tinggi untuk keluarga Indonesia.",
+    "description": "Rugged 7-seat SUV with high ground clearance and proven 1.5L reliability. Suits families who need extra seats and light off-road capability for Indonesia's varied road conditions.",
     "specs": {
       "engine": "1.5L 2NR-VE",
       "transmission": "Automatic",
@@ -674,7 +674,7 @@
     "brand": "Toyota",
     "type": "MPV",
     "basePrice": 193200000,
-    "description": "LCGC 7-seater paling hemat untuk keluarga dengan kebutuhan kabin maksimal.",
+    "description": "Budget-friendly LCGC 7-seater focused on maximum cabin space per rupiah. Best for large families prioritizing affordability, simple maintenance, and flexible seating over premium features.",
     "specs": {
       "engine": "1.2L 3NR-VE",
       "transmission": "Automatic",
@@ -697,7 +697,7 @@
     "brand": "Toyota",
     "type": "Hatchback",
     "basePrice": 198200000,
-    "description": "City car LCGC Toyota yang lincah, irit, dan mudah diparkir di perkotaan.",
+    "description": "Toyota LCGC city car with easy parking, low fuel consumption, and trusted Toyota durability. Perfect first car for urban singles or couples with tight budgets.",
     "specs": {
       "engine": "1.2L 3NR-VE",
       "transmission": "CVT",
@@ -720,7 +720,7 @@
     "brand": "Toyota",
     "type": "MPV",
     "basePrice": 437700000,
-    "description": "Generasi baru Kijang Innova bensin di platform TNGA dengan kabin lebih modern.",
+    "description": "Next-generation Kijang Innova on TNGA with a more modern cabin, improved NVH, and 2.0L gasoline CVT. The default choice for families upgrading from Avanza who want MPV comfort and Toyota reliability.",
     "specs": {
       "engine": "2.0L M20A-FKS",
       "transmission": "CVT",
@@ -749,7 +749,7 @@
     "brand": "Toyota",
     "type": "MPV",
     "basePrice": 624900000,
-    "description": "Innova Zenix hybrid tipe Q TSS, senyap, irit, dan dilengkapi Toyota Safety Sense.",
+    "description": "Flagship Innova Zenix Q Hybrid with Toyota Safety Sense and e-CVT hybrid system. Quieter drive, better fuel economy in traffic, and top-tier safety for premium MPV buyers.",
     "specs": {
       "engine": "2.0L Hybrid M20A-FXS",
       "transmission": "e-CVT",
@@ -778,7 +778,7 @@
     "brand": "Toyota",
     "type": "SUV",
     "basePrice": 372900000,
-    "description": "Urban SUV Toyota dengan ground clearance tinggi dan opsi hybrid di tipe atas.",
+    "description": "Urban SUV with raised ride height based on Yaris platform. Offers SUV practicality for city driving with optional hybrid grades for buyers wanting efficiency and crossover styling.",
     "specs": {
       "engine": "1.5L 2NR-VE",
       "transmission": "CVT",
@@ -819,7 +819,7 @@
     "brand": "Toyota",
     "type": "Hatchback",
     "basePrice": 347400000,
-    "description": "Hatchback sporty GR Sport, lincah di kota dengan handling yang presisi.",
+    "description": "Sporty GR Sport hatchback with precise handling and 1.5L CVT. Targets driving enthusiasts and urban users who want a fun, compact car with Toyota build quality.",
     "specs": {
       "engine": "1.5L 2NR-FE",
       "transmission": "CVT",
@@ -848,7 +848,7 @@
     "brand": "Toyota",
     "type": "MPV",
     "basePrice": 322400000,
-    "description": "MPV 7-seater premium di atas Avanza, dengan desain lebih gagah dan fitur lebih lengkap.",
+    "description": "Premium 7-seat MPV positioned above Avanza with bolder design and richer features. Ideal for families who outgrow Avanza but want DNGA practicality with more upscale equipment.",
     "specs": {
       "engine": "1.5L 2NR-VE",
       "transmission": "CVT",
@@ -871,7 +871,7 @@
     "brand": "Toyota",
     "type": "MPV",
     "basePrice": 632700000,
-    "description": "MPV kapten seat dengan pintu geser, kabin kapten, dan nuansa premium keluarga.",
+    "description": "Premium captain-seat MPV with power sliding doors and executive second-row seating. Built for comfort-focused families and business transport who prioritize cabin luxury over off-road ability.",
     "specs": {
       "engine": "2.0L M20A-FKS",
       "transmission": "CVT",
@@ -894,7 +894,7 @@
     "brand": "Toyota",
     "type": "Sedan",
     "basePrice": 1052000000,
-    "description": "Sport coupe RWD Gazoo Racing dengan mesin boxer 2.4L dan handling khas GR.",
+    "description": "Rear-wheel-drive sports coupe from Gazoo Racing with 2.4L boxer engine and manual gearbox. Pure driving machine for enthusiasts who value balance, feedback, and weekend track days.",
     "specs": {
       "engine": "2.4L Boxer FA24",
       "transmission": "Manual",
