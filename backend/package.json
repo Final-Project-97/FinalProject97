@@ -2,14 +2,21 @@
   "name": "rac-ai-backend",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/index.js",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "nodemon src/index.js",
     "start": "node src/index.js",
+    "indexes": "node scripts/create-indexes.js",
     "seed:cars": "node scripts/sync-cars.js",
     "expiry:cron": "node scripts/run-expiry-cron.js",
-    "indexes": "node scripts/create-indexes.js",
-    "test:integration": "node scripts/integration.js"
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest",
+    "test:watch": "NODE_OPTIONS=--experimental-vm-modules jest --watch",
+    "test:coverage": "NODE_OPTIONS=--experimental-vm-modules jest --coverage",
+    "test:integration": "node scripts/integration.js",
+    "postdeploy": "npm run indexes"
   },
   "keywords": [],
   "author": "",
@@ -17,7 +24,6 @@
   "type": "module",
   "dependencies": {
     "@langchain/groq": "^1.3.1",
-    "@langchain/openai": "^1.5.7",
     "axios": "^1.19.0",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.6",
@@ -25,7 +31,6 @@
     "express": "^5.2.1",
     "google-auth-library": "^11.0.2",
     "jsonwebtoken": "^9.0.3",
-    "langchain": "^1.5.8",
     "midtrans-client": "^1.4.3",
     "mongodb": "^6.21.0",
     "mongoloquent": "^3.15.1",
@@ -33,6 +38,9 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "nodemon": "^3.1.14"
+    "@jest/globals": "^30.4.1",
+    "jest": "^30.4.2",
+    "nodemon": "^3.1.14",
+    "supertest": "^7.2.2"
   }
 }
