@@ -21,3 +21,11 @@ export function parseJsonFromLlm(content) {
     .trim();
   return JSON.parse(clean);
 }
+
+export function formatCarChatCatalogLine(car) {
+  return (
+    `- ID: ${car._id}, Slug: ${car.slug}, Name: ${car.name}, Brand: ${car.brand}, ` +
+    `Type: ${car.type}, Price: Rp ${(Number(car.basePrice) || 0).toLocaleString('id-ID')}, ` +
+    `Seats: ${car.specs?.seats || 5}, Transmission: ${car.specs?.transmission || 'N/A'}`
+  );
+}
