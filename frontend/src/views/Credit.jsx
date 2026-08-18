@@ -98,7 +98,7 @@ function Credit() {
         carPrice: form.carPrice,
         downPayment,
         tenorMonths: form.tenorMonths,
-        interestRate: form.interestRate,
+        interestRatePerYear: form.interestRate,
       });
       setResult(response.data);
     } catch (requestError) {

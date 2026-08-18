@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Link } from "react-router";
 import { PiChatDotsBold, PiPaperPlaneRight, PiX } from "react-icons/pi";
 import { sendChatMessage } from "../../api/ai";
-import AuthProvider from "../../context/AuthContext";
 import useAuth from "../../context/useAuth";
 
 const initialMessage = {
@@ -241,9 +240,5 @@ function FloatAIContent() {
 }
 
 export default function FloatAI() {
-  return (
-    <AuthProvider>
-      <FloatAIContent />
-    </AuthProvider>
-  );
+  return <FloatAIContent />;
 }

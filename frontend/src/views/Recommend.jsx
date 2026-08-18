@@ -115,7 +115,13 @@ function Recommend() {
 
     try {
       const result = await getRecommendations(form);
-      const recommendationList = result.data?.recommendations || [];
+      const recommendationList = (result.data?.recommendations || []).filter(
+        (recommendation) => recommendation?.carId,
+      );
+
+      if (recommendationList.length === 0) {
+        throw new Error("The AI did not return a valid catalog recommendation. Please try again.");
+      }
       const recommendationsWithCars = await Promise.all(
         recommendationList.map(async (recommendation) => {
           try {
