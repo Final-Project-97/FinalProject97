@@ -120,7 +120,7 @@ function Recommend() {
 
   return (
     <div className="recommend-page min-h-screen bg-[#0b0d15] text-white">
-      <main className="recommend-container mx-auto max-w-7xl px-5 pb-24 pt-14 sm:px-8 lg:px-10">
+      <main className="recommend-container max-w-7xl mx-auto">
         <section className="recommend-hero mb-12 max-w-2xl">
           <div className="mb-5 flex items-center gap-3 text-xs font-bold uppercase tracking-[0.2em] text-blue-500">
             <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/15">

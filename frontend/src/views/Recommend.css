@@ -5,10 +5,12 @@
 
 .recommend-container {
   box-sizing: border-box;
-  width: min(100% - 48px, 1280px);
+  width: 100%;
   max-width: 1280px;
   margin-inline: auto;
-  padding: 56px 0 96px;
+  padding-inline: 48px !important;
+  padding-top: 56px;
+  padding-bottom: 96px;
 }
 
 .recommend-hero {
@@ -143,7 +145,7 @@
 
 @media (max-width: 820px) {
   .recommend-container {
-    width: min(100% - 32px, 720px);
+    padding-inline: 24px !important;
     padding-top: 40px;
   }
 
@@ -161,9 +163,9 @@
   }
 }
 
-@media (max-width: 520px) {
+@media (max-width: 639px) {
   .recommend-container {
-    width: min(100% - 24px, 480px);
+    padding-inline: 16px !important;
   }
 
   .recommend-hero h1 {
