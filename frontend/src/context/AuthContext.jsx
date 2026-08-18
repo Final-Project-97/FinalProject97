@@ -73,6 +73,14 @@ function AuthProvider({ children }) {
     setSubscription(result.subscription || null);
   }
 
+  function updateAiTokens(aiTokensRemaining) {
+    if (typeof aiTokensRemaining !== "number") return;
+
+    setUser((currentUser) =>
+      currentUser ? { ...currentUser, aiTokensRemaining } : currentUser,
+    );
+  }
+
   return (
     <AuthContext.Provider
       value={{
@@ -85,6 +93,7 @@ function AuthProvider({ children }) {
         signUpWithEmail,
         signOut,
         refreshUser,
+        updateAiTokens,
       }}
     >
       {children}

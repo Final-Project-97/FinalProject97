@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { getNearbyShowrooms } from "../api/showrooms";
 import ShowroomContext from "./showroom-context";
 
@@ -16,7 +16,14 @@ function getSavedSession() {
   if (!savedSession) return null;
 
   try {
-    return JSON.parse(savedSession);
+    const parsedSession = JSON.parse(savedSession);
+
+    if (parsedSession.error) {
+      sessionStorage.removeItem(SHOWROOM_SESSION_KEY);
+      return null;
+    }
+
+    return parsedSession;
   } catch {
     sessionStorage.removeItem(SHOWROOM_SESSION_KEY);
     return null;
@@ -61,7 +68,10 @@ async function loadShowrooms() {
 
 function getShowroomsOnce() {
   if (!showroomRequest) {
-    showroomRequest = loadShowrooms();
+    showroomRequest = loadShowrooms().catch((error) => {
+      showroomRequest = undefined;
+      throw error;
+    });
   }
 
   return showroomRequest;
@@ -74,6 +84,30 @@ function ShowroomProvider({ children }) {
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  const requestShowrooms = useCallback(async ({ force = false } = {}) => {
+    setIsLoading(true);
+    setError(null);
+
+    if (force) {
+      showroomRequest = undefined;
+      sessionStorage.removeItem(SHOWROOM_SESSION_KEY);
+    }
+
+    try {
+      const result = await getShowroomsOnce();
+      sessionStorage.setItem(SHOWROOM_SESSION_KEY, JSON.stringify(result));
+      setShowrooms(result.data);
+      setSource(result.source);
+      setLocation(result.location);
+    } catch (requestError) {
+      setShowrooms([]);
+      setSource(null);
+      setError(requestError.message);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     async function initializeShowrooms() {
       const savedSession = getSavedSession();
@@ -82,41 +116,31 @@ function ShowroomProvider({ children }) {
         setShowrooms(savedSession.data || []);
         setSource(savedSession.source || null);
         setLocation(savedSession.location || null);
-        setError(savedSession.error || null);
         setIsLoading(false);
         return;
       }
 
-      try {
-        const result = await getShowroomsOnce();
-        sessionStorage.setItem(SHOWROOM_SESSION_KEY, JSON.stringify(result));
-        setShowrooms(result.data);
-        setSource(result.source);
-        setLocation(result.location);
-      } catch (requestError) {
-        const failedSession = {
-          source: null,
-          data: [],
-          location: null,
-          error: requestError.message,
-        };
-
-        sessionStorage.setItem(
-          SHOWROOM_SESSION_KEY,
-          JSON.stringify(failedSession),
-        );
-        setError(requestError.message);
-      } finally {
-        setIsLoading(false);
-      }
+      await requestShowrooms();
     }
 
     initializeShowrooms();
-  }, []);
+  }, [requestShowrooms]);
+
+  const retryShowrooms = useCallback(
+    () => requestShowrooms({ force: true }),
+    [requestShowrooms],
+  );
 
   return (
     <ShowroomContext.Provider
-      value={{ showrooms, source, location, error, isLoading }}
+      value={{
+        showrooms,
+        source,
+        location,
+        error,
+        isLoading,
+        retryShowrooms,
+      }}
     >
       {children}
     </ShowroomContext.Provider>

@@ -29,7 +29,7 @@ function formatShortPrice(value) {
 }
 
 function Credit() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, updateAiTokens } = useAuth();
   const [searchParams] = useSearchParams();
   const [form, setForm] = useState(initialForm);
   const [selectedCar, setSelectedCar] = useState(null);
@@ -100,6 +100,7 @@ function Credit() {
         tenorMonths: form.tenorMonths,
         interestRatePerYear: form.interestRate,
       });
+      updateAiTokens(response.data?.remainingTokens);
       setResult(response.data);
     } catch (requestError) {
       if (requestError.status === 401) setLoginRequired(true);

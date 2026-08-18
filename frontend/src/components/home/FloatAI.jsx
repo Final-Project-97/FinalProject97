@@ -14,6 +14,7 @@ function FloatAIContent() {
     isAuthenticated,
     isLoading: isAuthLoading,
     subscription,
+    updateAiTokens,
     user,
   } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
@@ -62,6 +63,7 @@ function FloatAIContent() {
 
       if (typeof result.data?.remainingTokens === "number") {
         setRemainingTokens(result.data.remainingTokens);
+        updateAiTokens(result.data.remainingTokens);
       }
     } catch (requestError) {
       if (requestError.status === 401) {

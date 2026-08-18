@@ -8,7 +8,8 @@ function formatDistance(distance) {
 }
 
 function Showrooms() {
-  const { showrooms, source, location, error, isLoading } = useShowrooms();
+  const { showrooms, source, location, error, isLoading, retryShowrooms } =
+    useShowrooms();
 
   return (
     <div className="showrooms-page">
@@ -50,6 +51,13 @@ function Showrooms() {
             <PiMapPin />
             <h2>Unable to load nearby showrooms</h2>
             <p>{error}</p>
+            <button
+              className="showrooms-retry"
+              onClick={retryShowrooms}
+              type="button"
+            >
+              Try Again
+            </button>
           </section>
         )}
 

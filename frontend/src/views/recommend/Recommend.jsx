@@ -52,7 +52,7 @@ function getCarColors(car) {
 }
 
 function Recommend() {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, updateAiTokens, user } = useAuth();
   const { showrooms } = useShowrooms();
   const [form, setForm] = useState(initialForm);
   const [recommendations, setRecommendations] = useState([]);
@@ -115,6 +115,7 @@ function Recommend() {
 
     try {
       const result = await getRecommendations(form);
+      updateAiTokens(result.data?.remainingTokens);
       const recommendationList = (result.data?.recommendations || []).filter(
         (recommendation) => recommendation?.carId,
       );

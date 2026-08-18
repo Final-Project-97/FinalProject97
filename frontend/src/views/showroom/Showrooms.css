@@ -186,6 +186,22 @@
   margin-top: 6px;
 }
 
+.showrooms-retry {
+  min-height: 44px;
+  margin-top: 20px;
+  padding: 10px 20px;
+  border-radius: 999px;
+  background: #2563eb;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.showrooms-retry:hover {
+  background: #3b82f6;
+}
+
 @keyframes showroom-pulse {
   50% { opacity: 0.5; }
 }
