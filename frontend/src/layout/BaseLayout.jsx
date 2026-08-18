@@ -1,9 +1,12 @@
-import { Navigate, Outlet } from "react-router"
+import { Outlet, useLocation } from "react-router"
 import Navbar from "../components/Navbar"
 import Footer from "../components/Footer"
 import PreFooter from "../components/home/PreFooter"
 
 export default function BaseLayout() {
+  const location = useLocation()
+  const showPreFooter = location.pathname !== "/recommendation"
+
   // if (!localStorage.getItem("access_token")) {
   //   return <Navigate to={"/login"} />
   // }
@@ -14,7 +17,7 @@ export default function BaseLayout() {
       <main>
         <Outlet />
       </main>
-      <PreFooter />
+      {showPreFooter && <PreFooter />}
       <Footer />
     </>
   )

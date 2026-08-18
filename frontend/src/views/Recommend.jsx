@@ -1,21 +1,56 @@
 import { useState } from "react";
 import { Link } from "react-router";
+import { PiArrowRight, PiLightning, PiQuestion } from "react-icons/pi";
 import { getRecommendations } from "../api/ai";
 import { getCarById } from "../api/cars";
 import useAuth from "../context/useAuth";
 import useShowrooms from "../context/useShowrooms";
+import "./Recommend.css";
+
+const needOptions = ["Family", "City Car", "SUV", "MPV", "Business", "Adventure"];
+const colorOptions = ["White", "Black", "Silver", "Blue", "Red", "Gray"];
+const priorities = [
+  "Comfort",
+  "Fuel efficiency",
+  "Performance",
+  "Safety",
+  "Maintenance cost",
+];
+
+const colorDots = {
+  Black: "#171717",
+  Blue: "#31558b",
+  Gray: "#6b7280",
+  Red: "#b9382f",
+  Silver: "#aeb6c1",
+  White: "#f4f4ef",
+};
 
 const initialForm = {
-  budgetMin: "",
-  budgetMax: "",
-  needType: "Daily commute",
-  passengers: "4",
-  priority: "Comfort",
+  budgetMin: 200000000,
+  budgetMax: 700000000,
+  needType: "Family",
+  passengers: 5,
+  priority: "",
   selectedColor: "",
 };
 
+function formatMillion(value) {
+  return `Rp ${Math.round(Number(value) / 1000000)} million`;
+}
+
+function getCarColors(car) {
+  if (!Array.isArray(car?.colors)) return [];
+
+  return car.colors.slice(0, 4).map((color) =>
+    typeof color === "string"
+      ? colorDots[color] || color
+      : color.hex || color.hexCode || colorDots[color.name] || "#334155",
+  );
+}
+
 function Recommend() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const { showrooms } = useShowrooms();
   const [form, setForm] = useState(initialForm);
   const [recommendations, setRecommendations] = useState([]);
@@ -24,8 +59,7 @@ function Recommend() {
   const [loginRequired, setLoginRequired] = useState(false);
   const [upgradeRequired, setUpgradeRequired] = useState(false);
 
-  function handleChange(event) {
-    const { name, value } = event.target;
+  function updateForm(name, value) {
     setForm((currentForm) => ({ ...currentForm, [name]: value }));
   }
 
@@ -40,8 +74,13 @@ function Recommend() {
       return;
     }
 
-    if (Number(form.budgetMin) > Number(form.budgetMax)) {
+    if (form.budgetMin > form.budgetMax) {
       setError("Minimum budget cannot be greater than maximum budget.");
+      return;
+    }
+
+    if (!form.priority) {
+      setError("Please select your main priority.");
       return;
     }
 
@@ -49,13 +88,7 @@ function Recommend() {
     setRecommendations([]);
 
     try {
-      const result = await getRecommendations({
-        ...form,
-        budgetMin: Number(form.budgetMin),
-        budgetMax: Number(form.budgetMax),
-        passengers: Number(form.passengers),
-      });
-
+      const result = await getRecommendations(form);
       const recommendationList = result.data?.recommendations || [];
       const recommendationsWithCars = await Promise.all(
         recommendationList.map(async (recommendation) => {
@@ -86,143 +119,164 @@ function Recommend() {
   }
 
   return (
-    <main className="min-h-screen bg-[#0C0E16] px-4 py-10 text-white">
-      <div className="mx-auto max-w-5xl">
-        <header className="mb-8 max-w-2xl">
-          <p className="mb-2 text-sm font-semibold uppercase tracking-widest text-emerald-400">
-            RAC AI Recommendation
-          </p>
-          <h1 className="text-3xl font-bold md:text-4xl">
-            Find a car that fits your needs
+    <div className="recommend-page min-h-screen bg-[#0b0d15] text-white">
+      <main className="recommend-container mx-auto max-w-7xl px-5 pb-24 pt-14 sm:px-8 lg:px-10">
+        <section className="recommend-hero mb-12 max-w-2xl">
+          <div className="mb-5 flex items-center gap-3 text-xs font-bold uppercase tracking-[0.2em] text-blue-500">
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/15">
+              <PiQuestion className="text-xl" />
+            </span>
+            AI Powered
+          </div>
+          <h1 className="text-4xl font-black tracking-tight sm:text-5xl">
+            Smart Car <span className="text-blue-500">Recommendations</span>
           </h1>
-          <p className="mt-3 text-slate-400">
-            Complete the form and RAC AI will compare your preferences with
-            the available catalog.
+          <p className="mt-3 max-w-xl text-base leading-7 text-slate-400 sm:text-lg">
+            Tell us what you need. Our AI will analyze the catalog and recommend
+            the best options for you.
           </p>
-        </header>
+          <span className="mt-4 inline-flex rounded-full border border-blue-500/50 px-4 py-1.5 text-sm font-medium text-blue-400">
+            {user?.aiTokensRemaining ?? 3} AI tokens remaining
+          </span>
+        </section>
 
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
+        <section className="recommend-grid grid items-start gap-8 lg:grid-cols-[470px_minmax(0,1fr)]">
           <form
-            className="space-y-5 rounded-2xl border border-white/10 bg-white/5 p-5 md:p-6"
+            className="recommend-form space-y-7 rounded-2xl border border-white/10 bg-[#141720] p-6 shadow-2xl shadow-black/20"
             onSubmit={handleSubmit}
           >
-            <div className="grid gap-4 sm:grid-cols-2">
-              <label className="form-control">
-                <span className="mb-2 text-sm text-slate-300">
-                  Minimum budget
+            <div>
+              <p className="font-semibold">
+                Budget: {" "}
+                <span className="text-blue-500">
+                  {formatMillion(form.budgetMin)} – {formatMillion(form.budgetMax)}
                 </span>
+              </p>
+              <div className="mt-4 grid grid-cols-[48px_1fr] items-center gap-x-4 gap-y-3 text-sm text-slate-400">
+                <span>Min</span>
                 <input
-                  className="input w-full bg-[#171A24]"
-                  min="0"
-                  name="budgetMin"
-                  onChange={handleChange}
-                  placeholder="150000000"
-                  required
-                  type="number"
+                  aria-label="Minimum budget"
+                  className="recommend-range"
+                  max="950000000"
+                  min="50000000"
+                  onChange={(event) => updateForm("budgetMin", Number(event.target.value))}
+                  step="50000000"
+                  type="range"
                   value={form.budgetMin}
                 />
-              </label>
-
-              <label className="form-control">
-                <span className="mb-2 text-sm text-slate-300">
-                  Maximum budget
-                </span>
+                <span>Max</span>
                 <input
-                  className="input w-full bg-[#171A24]"
-                  min="0"
-                  name="budgetMax"
-                  onChange={handleChange}
-                  placeholder="300000000"
-                  required
-                  type="number"
+                  aria-label="Maximum budget"
+                  className="recommend-range"
+                  max="1000000000"
+                  min="100000000"
+                  onChange={(event) => updateForm("budgetMax", Number(event.target.value))}
+                  step="50000000"
+                  type="range"
                   value={form.budgetMax}
                 />
-              </label>
+              </div>
             </div>
 
-            <label className="form-control">
-              <span className="mb-2 text-sm text-slate-300">Main need</span>
+            <fieldset>
+              <legend className="mb-3 font-semibold">Type of need</legend>
+              <div className="flex flex-wrap gap-2">
+                {needOptions.map((option) => (
+                  <button
+                    className={`rounded-full border px-4 py-2 text-sm transition ${
+                      form.needType === option
+                        ? "border-blue-500 bg-blue-500/20 text-blue-400"
+                        : "border-white/10 bg-white/5 text-slate-400 hover:border-white/25 hover:text-white"
+                    }`}
+                    key={option}
+                    onClick={() => updateForm("needType", option)}
+                    type="button"
+                  >
+                    {option}
+                  </button>
+                ))}
+              </div>
+            </fieldset>
+
+            <div>
+              <label className="font-semibold" htmlFor="passengers">
+                Passengers: <span className="text-blue-500">{form.passengers} people</span>
+              </label>
+              <input
+                className="recommend-range mt-5 w-full"
+                id="passengers"
+                max="8"
+                min="1"
+                onChange={(event) => updateForm("passengers", Number(event.target.value))}
+                type="range"
+                value={form.passengers}
+              />
+            </div>
+
+            <label className="block" htmlFor="priority">
+              <span className="mb-3 block font-semibold">Main priority</span>
               <select
-                className="select w-full bg-[#171A24]"
-                name="needType"
-                onChange={handleChange}
-                value={form.needType}
+                className="recommend-select select h-13 w-full rounded-2xl border-white/15 bg-white/5 text-base focus:border-blue-500"
+                id="priority"
+                onChange={(event) => updateForm("priority", event.target.value)}
+                value={form.priority}
               >
-                <option>Daily commute</option>
-                <option>Family</option>
-                <option>Business</option>
-                <option>Long-distance travel</option>
-                <option>Off-road</option>
+                <option value="">Select a priority...</option>
+                {priorities.map((priority) => (
+                  <option key={priority} value={priority}>
+                    {priority}
+                  </option>
+                ))}
               </select>
             </label>
 
-            <div className="grid gap-4 sm:grid-cols-2">
-              <label className="form-control">
-                <span className="mb-2 text-sm text-slate-300">Passengers</span>
-                <input
-                  className="input w-full bg-[#171A24]"
-                  max="12"
-                  min="1"
-                  name="passengers"
-                  onChange={handleChange}
-                  required
-                  type="number"
-                  value={form.passengers}
-                />
-              </label>
-
-              <label className="form-control">
-                <span className="mb-2 text-sm text-slate-300">Priority</span>
-                <select
-                  className="select w-full bg-[#171A24]"
-                  name="priority"
-                  onChange={handleChange}
-                  value={form.priority}
-                >
-                  <option>Comfort</option>
-                  <option>Fuel efficiency</option>
-                  <option>Performance</option>
-                  <option>Safety</option>
-                  <option>Maintenance cost</option>
-                </select>
-              </label>
-            </div>
-
-            <label className="form-control">
-              <span className="mb-2 text-sm text-slate-300">
-                Preferred color (optional)
-              </span>
-              <input
-                className="input w-full bg-[#171A24]"
-                name="selectedColor"
-                onChange={handleChange}
-                placeholder="Black"
-                type="text"
-                value={form.selectedColor}
-              />
-            </label>
+            <fieldset>
+              <legend className="mb-3 font-semibold">
+                Color preference <span className="font-normal text-slate-500">(optional)</span>
+              </legend>
+              <div className="flex flex-wrap gap-2">
+                {colorOptions.map((color) => (
+                  <button
+                    className={`rounded-full border px-4 py-2 text-sm transition ${
+                      form.selectedColor === color
+                        ? "border-blue-500 bg-blue-500/20 text-blue-400"
+                        : "border-white/10 bg-white/5 text-slate-400 hover:border-white/25 hover:text-white"
+                    }`}
+                    key={color}
+                    onClick={() =>
+                      updateForm("selectedColor", form.selectedColor === color ? "" : color)
+                    }
+                    type="button"
+                  >
+                    {color}
+                  </button>
+                ))}
+              </div>
+            </fieldset>
 
             <button
-              className="btn w-full border-none bg-emerald-400 text-[#0C0E16] hover:bg-emerald-300"
+              className="recommend-submit flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-500 to-blue-700 font-bold shadow-lg shadow-blue-700/20 transition hover:brightness-110 disabled:cursor-wait disabled:opacity-60"
               disabled={isLoading}
               type="submit"
             >
-              {isLoading ? "Finding cars..." : "Get recommendations"}
+              <PiLightning className="text-xl" />
+              {isLoading ? "Analyzing catalog..." : "Get AI Recommendations"}
             </button>
 
             {loginRequired && (
-              <div className="alert border border-amber-400/30 bg-amber-400/10 text-amber-100">
-                <span>Please sign in before using AI recommendations.</span>
-                <Link className="btn btn-sm" to="/login">
-                  Sign in
-                </Link>
+              <div className="rounded-xl border border-amber-400/30 bg-amber-400/10 p-4 text-sm text-amber-100">
+                Please {" "}
+                <Link className="font-bold underline" to="/login">
+                  sign in
+                </Link>{" "}
+                before using AI recommendations.
               </div>
             )}
 
             {upgradeRequired && (
-              <div className="alert border border-violet-400/30 bg-violet-400/10 text-violet-100">
-                <span>Your free AI tokens have been used.</span>
-                <Link className="btn btn-sm" to="/upgrade">
+              <div className="rounded-xl border border-violet-400/30 bg-violet-400/10 p-4 text-sm text-violet-100">
+                Your free AI tokens have been used. {" "}
+                <Link className="font-bold underline" to="/upgrade">
                   View premium
                 </Link>
               </div>
@@ -235,75 +289,140 @@ function Recommend() {
             )}
           </form>
 
-          <section aria-live="polite">
-            <h2 className="mb-4 text-xl font-semibold">Recommendation results</h2>
+          <div className="recommend-results" aria-live="polite">
+            <div className="recommend-summary mb-6 flex min-h-24 items-center gap-5 rounded-2xl border border-blue-500/30 bg-blue-500/10 px-6 py-5">
+              <PiLightning className="shrink-0 text-3xl text-blue-500" />
+              <p className="leading-7 text-slate-200">
+                {recommendations.length > 0
+                  ? `AI analyzed the RAC catalog and found ${recommendations.length} of the best options for your needs.`
+                  : "Set your preferences, then let AI find the best matches from the RAC catalog."}
+              </p>
+            </div>
+
+            <p className="mb-5 text-sm uppercase tracking-[0.18em] text-slate-500">
+              {recommendations.length || 3} best recommendations
+            </p>
 
             {isLoading && (
               <div className="space-y-4">
-                {[1, 2].map((item) => (
-                  <div
-                    className="h-48 animate-pulse rounded-2xl bg-white/10"
-                    key={item}
-                  />
+                {[1, 2, 3].map((item) => (
+                  <div className="h-36 animate-pulse rounded-2xl bg-white/10" key={item} />
                 ))}
               </div>
             )}
 
             {!isLoading && recommendations.length === 0 && (
-              <div className="rounded-2xl border border-dashed border-white/15 p-8 text-center text-slate-400">
+              <div className="rounded-2xl border border-dashed border-white/15 px-8 py-20 text-center text-slate-500">
                 Your recommendation results will appear here.
               </div>
             )}
 
             <div className="space-y-4">
-              {recommendations.map((recommendation) => (
-                <article
-                  className="rounded-2xl border border-white/10 bg-white/5 p-5"
-                  key={recommendation.carId}
-                >
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <p className="text-sm text-emerald-400">
-                        {recommendation.matchScore}% match
-                      </p>
-                      <h3 className="mt-1 text-xl font-semibold">
-                        {recommendation.car?.name || "Recommended car"}
-                      </h3>
-                      {recommendation.car && (
-                        <p className="text-sm text-slate-400">
-                          {recommendation.car.brand} · {recommendation.car.type}
-                        </p>
-                      )}
-                    </div>
-                    {recommendation.selectedColor && (
-                      <span className="badge badge-outline">
-                        {recommendation.selectedColor}
-                      </span>
+              {recommendations.map((recommendation, index) => {
+                const car = recommendation.car;
+                const colors = getCarColors(car);
+
+                return (
+                  <article
+                    className="relative flex min-h-36 gap-5 rounded-2xl border border-white/10 bg-[#141720] p-5 transition hover:border-blue-500/40"
+                    key={recommendation.carId}
+                  >
+                    <span className="absolute -left-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full bg-blue-500 text-sm font-bold">
+                      {index + 1}
+                    </span>
+
+                    {car?.thumbnailUrl ? (
+                      <img
+                        alt={car.name}
+                        className="hidden h-24 w-40 rounded-xl object-cover sm:block"
+                        src={car.thumbnailUrl}
+                      />
+                    ) : (
+                      <div className="hidden h-24 w-40 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-slate-700 to-slate-900 text-xs text-slate-500 sm:flex">
+                        RAC AI
+                      </div>
                     )}
-                  </div>
 
-                  <p className="my-4 text-sm leading-6 text-slate-300">
-                    {recommendation.aiReason}
-                  </p>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-start justify-between gap-4">
+                        <div>
+                          <p className="text-sm text-slate-500">{car?.brand || "RAC Catalog"}</p>
+                          <h2 className="truncate text-xl font-bold">
+                            {car?.name || "Recommended car"}
+                          </h2>
+                        </div>
+                        {car?.basePrice && (
+                          <p className="shrink-0 font-bold text-blue-500">
+                            {formatMillion(car.basePrice)}
+                          </p>
+                        )}
+                      </div>
 
-                  <div className="flex flex-wrap gap-3">
-                    <Link
-                      className="btn btn-sm bg-white text-[#0C0E16]"
-                      to={`/car/${recommendation.carId}`}
-                    >
-                      View details
-                    </Link>
-                    <Link className="btn btn-outline btn-sm" to="/showrooms">
-                      Nearby showrooms ({showrooms.length})
-                    </Link>
-                  </div>
-                </article>
-              ))}
+                      <div className="mt-2 flex flex-wrap gap-2 text-xs">
+                        {car?.type && (
+                          <span className="rounded-full bg-blue-500/15 px-3 py-1 text-blue-400">
+                            {car.type}
+                          </span>
+                        )}
+                        <span className="rounded-full bg-white/5 px-3 py-1 text-slate-400">
+                          {recommendation.matchScore}% match
+                        </span>
+                        {recommendation.selectedColor && (
+                          <span className="rounded-full bg-white/5 px-3 py-1 text-slate-400">
+                            {recommendation.selectedColor}
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="mt-3 flex items-center justify-between gap-4">
+                        <div className="flex gap-2">
+                          {(colors.length > 0 ? colors : ["#f4f4ef", "#6b7280", "#31558b"]).map(
+                            (color, colorIndex) => (
+                              <span
+                                className="h-5 w-5 rounded-full border border-white/20"
+                                key={`${color}-${colorIndex}`}
+                                style={{ backgroundColor: color }}
+                              />
+                            ),
+                          )}
+                        </div>
+                        <div className="flex gap-3 text-sm">
+                          <Link className="text-blue-400 hover:text-blue-300" to={`/cars/${recommendation.carId}`}>
+                            Details
+                          </Link>
+                          <Link className="text-slate-400 hover:text-white" to="/showrooms">
+                            Showrooms ({showrooms.length})
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  </article>
+                );
+              })}
             </div>
-          </section>
-        </div>
-      </div>
-    </main>
+          </div>
+        </section>
+
+        <section className="recommend-catalog-cta mt-28 overflow-hidden rounded-3xl border border-blue-500/10 bg-gradient-to-r from-blue-950/60 via-[#111827] to-blue-950/30 px-6 py-16 text-center sm:px-12">
+          <p className="text-sm font-bold uppercase tracking-[0.18em] text-blue-500">
+            Complete Catalog
+          </p>
+          <h2 className="mt-4 text-3xl font-black sm:text-4xl">
+            Find Your <span className="text-blue-500">Dream Car</span>
+          </h2>
+          <p className="mx-auto mt-4 max-w-xl leading-7 text-slate-400">
+            Explore the complete collection with smart filters for brands,
+            vehicle types, prices, and features.
+          </p>
+          <Link
+            className="mt-8 inline-flex items-center gap-2 rounded-2xl bg-blue-600 px-8 py-4 font-bold transition hover:bg-blue-500"
+            to="/cars"
+          >
+            View Full Catalog <PiArrowRight />
+          </Link>
+        </section>
+      </main>
+    </div>
   );
 }
 

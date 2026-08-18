@@ -4,6 +4,9 @@ import BaseLayout from "./layout/BaseLayout";
 import Login from "./views/Login";
 import CarDetail from "./views/CarDetail";
 import Catalog from "./views/Catalog";
+import Recommend from "./views/Recommend";
+import AuthProvider from "./context/AuthContext";
+import ShowroomProvider from "./context/ShowroomContext";
 
 function App() {
   return (
@@ -16,6 +19,16 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/cars" element={<Catalog />} />
             <Route path="/cars/:id" element={<CarDetail />} />
+            <Route
+              path="/recommendation"
+              element={
+                <AuthProvider>
+                  <ShowroomProvider>
+                    <Recommend />
+                  </ShowroomProvider>
+                </AuthProvider>
+              }
+            />
             {/* Placeholder routes for Brian */}
             {/* <Route path="/credit" element={<Credit />} /> */}
             {/* <Route path="/profile" element={<Profile />} /> */}
