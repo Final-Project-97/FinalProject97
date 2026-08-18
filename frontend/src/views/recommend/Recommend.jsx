@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import { getRecommendations } from "../../api/ai";
 import { getCarById } from "../../api/cars";
 import { addWishlist } from "../../api/wishlist";
+import AiAccessPrompt from "../../components/shared/AiAccessPrompt";
 import useAuth from "../../context/useAuth";
 import useShowrooms from "../../context/useShowrooms";
 import "./Recommend.css";
@@ -289,7 +290,7 @@ function Recommend() {
 
             <button
               className="recommend-submit flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-500 to-blue-700 font-bold shadow-lg shadow-blue-700/20 transition hover:brightness-110 disabled:cursor-wait disabled:opacity-60"
-              disabled={isLoading}
+              disabled={isLoading || upgradeRequired}
               type="submit"
             >
               <PiLightning className="text-xl" />
@@ -307,12 +308,7 @@ function Recommend() {
             )}
 
             {upgradeRequired && (
-              <div className="rounded-xl border border-violet-400/30 bg-violet-400/10 p-4 text-sm text-violet-100">
-                Your free AI tokens have been used. {" "}
-                <Link className="font-bold underline" to="/upgrade">
-                  View premium
-                </Link>
-              </div>
+              <AiAccessPrompt />
             )}
 
             {error && (

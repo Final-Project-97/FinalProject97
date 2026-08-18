@@ -3,6 +3,7 @@ import { Link, useSearchParams } from "react-router";
 import { PiCreditCard, PiLightbulb, PiX } from "react-icons/pi";
 import { simulateCredit } from "../../api/ai";
 import { getCarById } from "../../api/cars";
+import AiAccessPrompt from "../../components/shared/AiAccessPrompt";
 import useAuth from "../../context/useAuth";
 import "./Credit.css";
 
@@ -164,7 +165,7 @@ function Credit() {
               {isSubmitting ? "Calculating..." : "Calculate Installment"}
             </button>
             {loginRequired && <p className="credit-notice">Please <Link to="/login">sign in</Link> before using the simulation.</p>}
-            {upgradeRequired && <p className="credit-notice">AI tokens are exhausted. <Link to="/upgrade">View premium</Link>.</p>}
+            {upgradeRequired && <AiAccessPrompt />}
           </form>
 
           <div className="credit-results" aria-live="polite">

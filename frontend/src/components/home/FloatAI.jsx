@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router";
 import { PiChatDotsBold, PiPaperPlaneRight, PiX } from "react-icons/pi";
 import { sendChatMessage } from "../../api/ai";
+import AiAccessPrompt from "../shared/AiAccessPrompt";
 import useAuth from "../../context/useAuth";
 
 const initialMessage = {
@@ -175,13 +176,7 @@ function FloatAIContent() {
               </p>
             )}
             {isAccessExhausted && (
-              <p className="mx-3 mt-3 rounded-xl border border-violet-400/20 bg-violet-400/10 p-2.5 text-xs text-violet-100">
-                Your AI tokens are exhausted.{" "}
-                <Link className="font-bold underline" to="/upgrade">
-                  View premium
-                </Link>{" "}
-                to continue.
-              </p>
+              <AiAccessPrompt className="mx-3 mt-3 text-xs" />
             )}
             {error && (
               <p
