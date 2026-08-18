@@ -1,45 +1,97 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
-import { PiHeart, PiCalculator, PiMapPin } from "react-icons/pi";
+import { PiHeart, PiHeartFill, PiCalculator, PiMapPin } from "react-icons/pi";
 import { toast } from "react-toastify";
-import { addWishlist } from "../../api/wishlist";
+import { addWishlist, deleteWishlist, getWishlist } from "../../api/wishlist";
 import useAuth from "../../context/useAuth";
 
 export default function CarActions({ carId, selectedColor, tags }) {
    const { isAuthenticated } = useAuth();
    const location = useLocation();
    const navigate = useNavigate();
-   const [isAdding, setIsAdding] = useState(false);
 
-   async function handleAddWishlist() {
+   const [isInWishlist, setIsInWishlist] = useState(false);
+   const [wishlistEntryId, setWishlistEntryId] = useState(null);
+   const [isProcessing, setIsProcessing] = useState(false);
+
+   // Check if Car is Already in User Wishlist
+   useEffect(() => {
+      async function checkWishlistStatus() {
+         if (!isAuthenticated || !carId) return;
+         try {
+            const response = await getWishlist();
+            const items = response.data || response || [];
+            const match = items.find(
+               (item) => item.carId === carId || item.car?._id === carId || item.car?.slug === carId
+            );
+            if (match) {
+               setIsInWishlist(true);
+               setWishlistEntryId(match._id);
+            } else {
+               setIsInWishlist(false);
+               setWishlistEntryId(null);
+            }
+         } catch {
+            // Fallback silently if wishlist check fails
+         }
+      }
+
+      checkWishlistStatus();
+   }, [isAuthenticated, carId]);
+
+   // Toggle Wishlist Action
+   async function handleToggleWishlist() {
       if (!isAuthenticated) {
          navigate("/login", { state: { from: location } });
          return;
       }
 
-      setIsAdding(true);
+      setIsProcessing(true);
       try {
-         await addWishlist({ carId, selectedColor, source: "detail" });
-         toast.success("Car added to your wishlist.");
+         if (isInWishlist && wishlistEntryId) {
+            // Remove from wishlist
+            await deleteWishlist(wishlistEntryId);
+            setIsInWishlist(false);
+            setWishlistEntryId(null);
+            toast.info("Removed from your wishlist.");
+         } else {
+            // Add to wishlist
+            const res = await addWishlist({ carId, selectedColor, source: "detail" });
+            setIsInWishlist(true);
+            setWishlistEntryId(res.data?._id || res._id);
+            toast.success("Car added to your wishlist.");
+         }
       } catch (error) {
-         toast.error(error.status === 409 ? "This car is already in your wishlist." : error.message);
+         toast.error(error.status === 409 ? "Already in your wishlist." : error.message);
       } finally {
-         setIsAdding(false);
+         setIsProcessing(false);
       }
    }
 
    return (
       <div className="space-y-4">
-         {/* Primary Action: Wishlist */}
+         {/* Primary Action: Dynamic Wishlist Button */}
          <button
             type="button"
             data-car-id={carId}
-            disabled={isAdding}
-            onClick={handleAddWishlist}
-            className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold py-3.5 px-6 rounded-full shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all cursor-pointer"
+            disabled={isProcessing}
+            onClick={handleToggleWishlist}
+            className={`w-full flex items-center justify-center gap-2 text-xs sm:text-sm font-bold py-3.5 px-6 rounded-full transition-all cursor-pointer shadow-lg ${isInWishlist
+                  ? "bg-pink-600/20 border border-pink-500/40 text-pink-400 hover:bg-pink-600/30 shadow-pink-500/20"
+                  : "bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/25 hover:shadow-blue-500/40"
+               }`}
          >
-            <PiHeart className="text-base" />
-            <span>{isAdding ? "Adding..." : "Add to Wishlist"}</span>
+            {isInWishlist ? (
+               <>
+                  <PiHeartFill className="text-base text-pink-500" />
+                  <span>{isProcessing ? "Updating..." : "In Wishlist (Saved)"}</span>
+               </>
+            ) : (
+               <>
+                  <PiHeart className="text-base" />
+                  <span>{isProcessing ? "Adding..." : "Add to Wishlist"}</span>
+               </>
+            )}
          </button>
 
          {/* Secondary Actions: Credit & Showroom */}
@@ -54,7 +106,7 @@ export default function CarActions({ carId, selectedColor, tags }) {
 
             <Link
                to="/showrooms"
-               className="flex items-center justify-center gap-2 bg-[#141620] hover:bg-white/10 border border-white/15 text-gray-200 hover:text-white text-xs font-semibold py-3 px-4 rounded-full transition-all cursor-pointer"
+               className="flex items-center justify-center gap-2 bg-[#141620] hover:bg-white/10 border border-white/15 text-gray-200 hover:text-white text-xs font-semibold py-3 px-4 rounded-full transition-all"
             >
                <PiMapPin className="text-base text-emerald-400" />
                <span>Find Showroom</span>
@@ -62,13 +114,15 @@ export default function CarActions({ carId, selectedColor, tags }) {
          </div>
 
          {/* Tags */}
-         <div className="flex flex-wrap gap-1.5 pt-2">
-            {tags.map((tag, i) => (
-               <span key={i} className="text-[10px] font-mono text-gray-500 bg-white/5 px-2.5 py-1 rounded-full">
-                  {tag}
-               </span>
-            ))}
-         </div>
+         {tags && tags.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 pt-2">
+               {tags.map((tag, i) => (
+                  <span key={i} className="text-[10px] font-mono text-gray-400 bg-white/5 px-2.5 py-1 rounded-full border border-white/5">
+                     {tag}
+                  </span>
+               ))}
+            </div>
+         )}
       </div>
    );
 }

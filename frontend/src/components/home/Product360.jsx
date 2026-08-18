@@ -118,28 +118,19 @@ export default function Product360() {
               </p>
             </div>
 
-            <div className="space-y-3 pt-2">
+            <div className="pt-2">
               <div className="flex items-center gap-3">
                 {colors.map((color) => (
                   <button
                     key={color.name}
+                    type="button"
                     onClick={() => setSelectedColor(color)}
                     className={`w-8 h-8 rounded-full transition-all duration-200 cursor-pointer relative flex items-center justify-center ${selectedColor.name === color.name
-                        ? "ring-2 ring-blue-500 ring-offset-2 ring-offset-[#0C0E16] scale-110"
-                        : "hover:scale-105 opacity-80 hover:opacity-100"
+                      ? "ring-2 ring-blue-500 ring-offset-2 ring-offset-[#0C0E16] scale-110"
+                      : "hover:scale-105 opacity-80 hover:opacity-100"
                       }`}
                     style={{ backgroundColor: color.hex }}
                     aria-label={color.name}
-                  />
-                ))}
-              </div>
-
-              <div className="flex items-center gap-1.5 pt-1">
-                {colors.map((color) => (
-                  <div
-                    key={color.name}
-                    className={`h-1 rounded-full transition-all duration-300 ${selectedColor.name === color.name ? "w-6 bg-blue-500" : "w-3 bg-white/15"
-                      }`}
                   />
                 ))}
               </div>

@@ -37,7 +37,7 @@ export default function Footer() {
                   </p>
                   <ul className="space-y-2.5 text-xs text-gray-400">
                      <li>
-                        <Link to="/recomendation" className="hover:text-white transition-colors flex items-center justify-between group">
+                        <Link to="/recommendation" className="hover:text-white transition-colors flex items-center justify-between group">
                            <span>Smart AI Recommendation</span>
                            <span className="text-[10px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full">Free</span>
                         </Link>
