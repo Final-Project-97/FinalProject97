@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import { addWishlist } from "../../api/wishlist";
 import useAuth from "../../context/useAuth";
 
-export default function CarActions({ carId, tags }) {
+export default function CarActions({ carId, selectedColor, tags }) {
    const { isAuthenticated } = useAuth();
    const location = useLocation();
    const navigate = useNavigate();
@@ -19,7 +19,7 @@ export default function CarActions({ carId, tags }) {
 
       setIsAdding(true);
       try {
-         await addWishlist({ carId, source: "detail" });
+         await addWishlist({ carId, selectedColor, source: "detail" });
          toast.success("Car added to your wishlist.");
       } catch (error) {
          toast.error(error.status === 409 ? "This car is already in your wishlist." : error.message);
