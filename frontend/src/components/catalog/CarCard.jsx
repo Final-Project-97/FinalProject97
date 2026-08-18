@@ -2,6 +2,7 @@ import { Link } from "react-router";
 import { PiArrowRight, PiUsers, PiGear, PiGasPump } from "react-icons/pi";
 
 export default function CarCard({ car }) {
+   const carId = car._id || car.id || car.slug;
    const formatRupiah = (num) =>
       new Intl.NumberFormat("id-ID", {
          style: "currency",
@@ -63,7 +64,7 @@ export default function CarCard({ car }) {
             </div>
 
             <Link
-               to={`/cars/${car.id}`}
+               to={`/cars/${carId}`}
                className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-4 py-2 rounded-full transition-all shadow-md shadow-blue-500/20 cursor-pointer"
             >
                <span>Details</span>
