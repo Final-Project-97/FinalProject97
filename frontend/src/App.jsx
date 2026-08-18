@@ -11,6 +11,7 @@ import ShowroomProvider from "./context/ShowroomContext";
 import Showrooms from "./views/Showrooms";
 import Credit from "./views/Credit";
 import Wishlist from "./views/Wishlist";
+import Upgrade from "./views/Upgrade";
 import ProtectedRoute from "./components/shared/ProtectedRoute";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -55,6 +56,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Wishlist />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/upgrade"
+              element={
+                <ProtectedRoute>
+                  <Upgrade />
                 </ProtectedRoute>
               }
             />

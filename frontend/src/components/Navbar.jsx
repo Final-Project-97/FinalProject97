@@ -21,7 +21,7 @@ export default function Navbar() {
 
     // Mock User Data
     const user = {
-        isLoggedIn: true,
+        isLoggedIn: false,
         name: "Budi Santoso",
         email: "budi@example.com",
         plan: "free",
