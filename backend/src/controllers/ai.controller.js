@@ -29,7 +29,7 @@ export const handleAIChat = async (req, res) => {
 
     const chatModel = new ChatGroq({
       apiKey: process.env.GROQ_API_KEY,
-      model: "llama-3.3-70b-versatile",
+      model: "openai/gpt-oss-120b",
       temperature: 0.3,
     });
 
@@ -130,7 +130,7 @@ export const handleAIRecommend = async (req, res) => {
     // Inisialisasi model ChatGroq via LangChain (Model Groq Aktif: llama-3.3-70b-versatile)
     const recommendationModel = new ChatGroq({
       apiKey: process.env.GROQ_API_KEY,
-      model: "llama-3.3-70b-versatile",
+      model: "openai/gpt-oss-120b",
       temperature: 0.2,
     });
 
@@ -268,7 +268,7 @@ export const handleCreditSimulation = async (req, res) => {
     // Minta Analisis Tambahan dari AI (Groq + LangChain) untuk Insight Keuangan
     const aiModel = new ChatGroq({
       apiKey: process.env.GROQ_API_KEY,
-      model: "llama-3.1-70b-versatile",
+      model: "openai/gpt-oss-120b",
       temperature: 0.3,
     });
 
