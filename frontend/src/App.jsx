@@ -7,6 +7,7 @@ import Catalog from "./views/Catalog";
 import Recommend from "./views/Recommend";
 import AuthProvider from "./context/AuthContext";
 import ShowroomProvider from "./context/ShowroomContext";
+import Showrooms from "./views/Showrooms";
 
 function App() {
   return (
@@ -27,6 +28,14 @@ function App() {
                     <Recommend />
                   </ShowroomProvider>
                 </AuthProvider>
+              }
+            />
+            <Route
+              path="/showrooms"
+              element={
+                <ShowroomProvider>
+                  <Showrooms />
+                </ShowroomProvider>
               }
             />
             {/* Placeholder routes for Brian */}
