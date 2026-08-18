@@ -7,6 +7,11 @@ dotenv.config();
 
 const BASE = process.env.TEST_BASE_URL || 'http://localhost:5001';
 const SKIP_GOOGLE = process.env.SKIP_GOOGLE_TEST !== '0';
+
+// Jeda antar AI call — hindari Groq TPM rate limit (free tier ~8000/min)
+const AI_CALL_DELAY_MS = Number(process.env.INTEGRATION_AI_DELAY_MS || 12_000);
+const AI_PREMIUM_DELAY_MS = Number(process.env.INTEGRATION_PREMIUM_DELAY_MS || 15_000);
+
 const email = `ml09-${Date.now()}@example.com`;
 const password = 'password12345';
 
@@ -23,6 +28,10 @@ let userId = '';
 let checkoutOrderId = '';
 let passed = 0;
 let failed = 0;
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 async function req(method, path, body, auth = false) {
   const headers = { 'Content-Type': 'application/json' };
@@ -102,6 +111,10 @@ if (SKIP_GOOGLE) {
 for (let i = 1; i <= 5; i++) {
   r = await req('POST', '/api/ai/recommend', AI_BODY, true);
   console.log(`  AI call #${i}: ${r.status}`);
+  if (i < 5) {
+    console.log(`  … tunggu ${AI_CALL_DELAY_MS / 1000}s (Groq TPM)`);
+    await sleep(AI_CALL_DELAY_MS);
+  }
 }
 
 r = await req('GET', '/api/auth/me', null, true);
@@ -135,7 +148,11 @@ if (!checkoutOrderId) {
       r.status === 200 && r.json.data.premiumActive === true,
     );
 
+    console.log(`  … tunggu ${AI_PREMIUM_DELAY_MS / 1000}s sebelum AI premium`);
+    await sleep(AI_PREMIUM_DELAY_MS);
+
     r = await req('POST', '/api/ai/recommend', AI_BODY, true);
+    console.log(`  AI premium call: ${r.status}`);
     assert('AI lolos saat premium', r.status === 200);
   } catch (err) {
     console.log(`✗ premium simulate — ${err.message}`);
