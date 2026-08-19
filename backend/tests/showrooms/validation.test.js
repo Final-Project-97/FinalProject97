@@ -11,4 +11,10 @@ describe('nearbyQuerySchema', () => {
   it('rejects invalid lat', () => {
     expect(nearbyQuerySchema.safeParse({ lat: 999, lng: 0 }).success).toBe(false);
   });
+
+  it('accepts optional brand', () => {
+    const r = nearbyQuerySchema.safeParse({ lat: '-6.2', lng: '106.8', brand: 'Toyota' });
+    expect(r.success).toBe(true);
+    expect(r.data.brand).toBe('Toyota');
+  });
 });
