@@ -86,7 +86,7 @@ export default function CarDetail() {
           <div className="lg:col-span-5 flex flex-col space-y-6">
             <CarInfo brand={car.brand} category={car.type} isTopProduct={car.isTopProduct} name={car.name} price={formatRupiah(car.basePrice)} priceNote="*Estimated OTR Jakarta. Monthly installments available." quickSpecs={quickSpecs} year={car.year || "2025"} />
             <CarTabs description={car.description || "No description is available for this car."} specs={specsList} />
-            <CarActions carId={car._id} selectedColor={selectedColor?.name} tags={[`#${car.brand}`, `#${car.type}`, `#${car.name.replace(/\s+/g, "")}`].filter(Boolean)} />
+            <CarActions carId={car._id} brand={car.brand} selectedColor={selectedColor?.name} tags={[`#${car.brand}`, `#${car.type}`, `#${car.name.replace(/\s+/g, "")}`].filter(Boolean)} />
           </div>
         </div>
       </div>

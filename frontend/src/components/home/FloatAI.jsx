@@ -1,16 +1,23 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
-import { PiChatDotsBold, PiPaperPlaneRight, PiX } from "react-icons/pi";
+import {
+  PiChatDotsBold,
+  PiPaperPlaneRight,
+  PiX,
+  PiArrowSquareOut,
+} from "react-icons/pi";
 import { sendChatMessage } from "../../api/ai";
 import AiAccessPrompt from "../shared/AiAccessPrompt";
 import useAuth from "../../context/useAuth";
 
+// Default welcome message
 const initialMessage = {
   sender: "ai",
   text: "Hello! I am the RAC AI Assistant. Ask me about cars, specifications, prices, or recommendations — I am ready to help!",
 };
 
 function FloatAIContent() {
+  // Auth context and AI token state
   const {
     isAuthenticated,
     isLoading: isAuthLoading,
@@ -19,6 +26,7 @@ function FloatAIContent() {
     user,
   } = useAuth();
 
+  // Chat and modal states
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([initialMessage]);
   const [inputText, setInputText] = useState("");
@@ -29,27 +37,27 @@ function FloatAIContent() {
   const [loginRequired, setLoginRequired] = useState(false);
   const [upgradeRequired, setUpgradeRequired] = useState(false);
 
+  // DOM references
   const textareaRef = useRef(null);
-  const chatContainerRef = useRef(null); // ref for the scrollable chat area
+  const chatContainerRef = useRef(null);
 
-  // Scroll chat container to bottom
+  // Scroll chat window to bottom
   function scrollToBottom() {
     const container = chatContainerRef.current;
     if (!container) return;
-    // Small delay ensures DOM has updated before scrolling
     requestAnimationFrame(() => {
       container.scrollTop = container.scrollHeight;
     });
   }
 
-  // Auto-scroll when messages change, AI is typing, or chat opens
+  // Trigger auto-scroll on new messages or modal open
   useEffect(() => {
     if (isOpen) {
       scrollToBottom();
     }
   }, [messages, isSending, isOpen]);
 
-  // Auto-resize input textarea
+  // Adjust input textarea height on typing
   const handleInputChange = (e) => {
     setInputText(e.target.value);
     if (textareaRef.current) {
@@ -58,7 +66,7 @@ function FloatAIContent() {
     }
   };
 
-  // Handle send message
+  // Handle message submission
   async function handleSend(event) {
     if (event) event.preventDefault();
 
@@ -68,11 +76,13 @@ function FloatAIContent() {
     setError("");
     setLoginRequired(false);
 
+    // Require authentication
     if (!isAuthenticated) {
       setLoginRequired(true);
       return;
     }
 
+    // Add user message to state
     setMessages((prev) => [...prev, { sender: "user", text: message }]);
     setInputText("");
 
@@ -86,13 +96,16 @@ function FloatAIContent() {
     try {
       const result = await sendChatMessage(message);
       const reply = result.data?.reply;
+      const items = result.data?.items;
 
       if (!reply) {
         throw new Error("The AI response was empty. Please try again.");
       }
 
-      setMessages((prev) => [...prev, { sender: "ai", text: reply }]);
+      // Append AI reply with attached car recommendation items
+      setMessages((prev) => [...prev, { sender: "ai", text: reply, items }]);
 
+      // Sync remaining token balance
       if (typeof result.data?.remainingTokens === "number") {
         setRemainingTokens(result.data.remainingTokens);
         updateAiTokens(result.data.remainingTokens);
@@ -114,7 +127,7 @@ function FloatAIContent() {
     }
   }
 
-  // Handle Enter to send (Shift+Enter for newline)
+  // Keyboard shortcut: Enter to send, Shift+Enter for newline
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -122,6 +135,7 @@ function FloatAIContent() {
     }
   };
 
+  // Validate token and subscription status
   const availableTokens = remainingTokens ?? user?.aiTokensRemaining;
   const subscriptionExpiry = subscription?.expiresAt
     ? new Date(subscription.expiresAt).getTime()
@@ -134,6 +148,7 @@ function FloatAIContent() {
     availableTokens <= 0;
   const isAccessExhausted = upgradeRequired || hasNoFreeTokens;
 
+  // Header status label
   const tokenLabel = isAuthLoading
     ? "Checking AI access..."
     : isAuthenticated
@@ -150,7 +165,7 @@ function FloatAIContent() {
           aria-label="RAC AI Assistant"
           className="fixed bottom-24 right-4 z-50 flex h-[500px] w-[340px] flex-col overflow-hidden rounded-3xl border border-white/15 bg-[#141620] shadow-2xl duration-300 animate-in fade-in slide-in-from-bottom-5 sm:right-6 sm:w-[380px]"
         >
-          {/* Header */}
+          {/* Modal Header */}
           <header className="flex items-center justify-between border-b border-white/10 bg-[#0C0E16] px-5 py-4">
             <div className="flex items-center gap-3">
               <div className="rounded-xl bg-blue-600/20 p-2 text-blue-400">
@@ -176,7 +191,7 @@ function FloatAIContent() {
             </button>
           </header>
 
-          {/* Messages Scroll Area — ref on container for reliable scroll */}
+          {/* Messages Scroll Area */}
           <div
             ref={chatContainerRef}
             className="flex-1 space-y-3 overflow-y-auto p-4 text-xs"
@@ -187,18 +202,46 @@ function FloatAIContent() {
                 className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}
                 key={`${message.sender}-${index}`}
               >
-                {/* Message Bubble with Text Wrapping */}
-                <p
-                  className={`max-w-[85%] rounded-2xl p-3 text-xs leading-relaxed break-words break-all whitespace-pre-wrap ${message.sender === "user"
-                    ? "rounded-br-none bg-blue-600 text-white"
-                    : "rounded-bl-none border border-white/10 bg-white/5 text-gray-200"
+                {/* Chat Bubble with Text & Car Recommendations */}
+                <div
+                  className={`max-w-[85%] rounded-2xl p-3 text-xs leading-relaxed ${message.sender === "user"
+                      ? "rounded-br-none bg-blue-600 text-white"
+                      : "rounded-bl-none border border-white/10 bg-white/5 text-gray-200"
                     }`}
                 >
-                  {message.text}
-                </p>
+                  <p className="break-words break-all whitespace-pre-wrap">
+                    {message.text}
+                  </p>
+
+                  {/* Recommended Cars List */}
+                  {message.items && message.items.length > 0 && (
+                    <div className="mt-2.5 space-y-2.5">
+                      {message.items.map((item, itemIndex) => (
+                        <div
+                          key={item.carId || itemIndex}
+                          className="border-t border-white/10 pt-2 first:border-t-0 first:pt-0"
+                        >
+                          <p className="font-bold text-white">
+                            {itemIndex + 1}. {item.name}
+                          </p>
+                          <Link
+                            to={`/cars/${item.carId}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-blue-400 hover:underline mt-0.5"
+                          >
+                            <span>View product details</span>
+                            <PiArrowSquareOut className="text-xs" />
+                          </Link>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             ))}
 
+            {/* AI Typing Indicator */}
             {isSending && (
               <div className="flex justify-start">
                 <p className="rounded-2xl rounded-bl-none border border-white/10 bg-white/5 p-3 text-gray-400">
@@ -208,7 +251,7 @@ function FloatAIContent() {
             )}
           </div>
 
-          {/* Input Footer Area */}
+          {/* Footer Input Area */}
           <div className="bg-[#0C0E16]">
             {loginRequired && (
               <p className="mx-3 mt-3 rounded-xl border border-amber-400/20 bg-amber-400/10 p-2.5 text-xs text-amber-100">
@@ -231,7 +274,7 @@ function FloatAIContent() {
               </p>
             )}
 
-            {/* Auto-Wrapping Input Form */}
+            {/* Message Input Form */}
             <form
               className="flex items-end gap-2 border-t border-white/10 p-3"
               onSubmit={handleSend}
@@ -256,7 +299,7 @@ function FloatAIContent() {
                 value={inputText}
               />
 
-              {/* Send Button */}
+              {/* Submit Button */}
               <button
                 aria-label="Send message"
                 className="cursor-pointer shrink-0 rounded-full bg-blue-600 p-2.5 text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-40 mb-0.5"

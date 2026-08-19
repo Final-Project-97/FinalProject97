@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, Navigate, useLocation, useNavigate } from "react-router";
-import { PiCar, PiCheckCircle, PiSparkle } from "react-icons/pi";
+import { PiCheckCircle, PiSparkle } from "react-icons/pi";
 import { FcGoogle } from "react-icons/fc"; // Google icon with brand colors
 import racLogo from "../../assets/RAC-Logo 1.png";
 import useAuth from "../../context/useAuth";

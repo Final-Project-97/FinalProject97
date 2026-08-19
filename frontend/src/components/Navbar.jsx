@@ -144,12 +144,7 @@ export default function Navbar() {
                             {isAuthenticated ? (
                                 <>
                                     {/* Badge: premium crown or token count */}
-                                    {isPremium ? (
-                                        <div className="hidden sm:flex items-center gap-1.5 bg-blue-600/15 border border-blue-500/30 text-blue-400 text-xs font-semibold px-3.5 py-1.5 rounded-full">
-                                            <PiCrown className="text-sm" />
-                                            <span>Premium</span>
-                                        </div>
-                                    ) : (
+                                    {!isPremium && (
                                         <div className="hidden sm:flex items-center gap-1.5 bg-blue-600/10 border border-blue-500/25 text-blue-400 text-xs font-semibold px-3 py-1.5 rounded-full">
                                             <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
                                             <span>{remainingTokens} Tokens</span>
@@ -172,7 +167,8 @@ export default function Navbar() {
                                                 <span className="text-xs font-bold text-white leading-tight">
                                                     {user?.name || "User"}
                                                 </span>
-                                                <span className={`text-[10px] font-medium ${isPremium ? "text-blue-400 font-semibold" : "text-gray-400"}`}>
+                                                <span className={`flex items-center gap-1 text-[10px] font-medium ${isPremium ? "text-blue-400 font-semibold" : "text-gray-400"}`}>
+                                                    {isPremium && <PiCrown className="text-xs" />}
                                                     {isPremium ? "Pro Plan" : "Free Plan"}
                                                 </span>
                                             </div>
