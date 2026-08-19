@@ -29,15 +29,34 @@ describe('aiGateMiddleware', () => {
     mockUserFind.mockResolvedValue({ _id: 'u1', aiTokensRemaining: 0 });
     mockSubWhere.mockReturnValue({
       where: jest.fn().mockReturnThis(),
-      first: jest.fn().mockResolvedValue({ paymentStatus: 'success', expiresAt: new Date(Date.now() + 86400000) }),
+      first: jest.fn().mockResolvedValue({
+        paymentStatus: 'success',
+        expiresAt: new Date(Date.now() + 86400000),
+      }),
     });
     const next = jest.fn();
-    const res = mockRes();
-    await aiGateMiddleware(mockReq({ user: { _id: 'u1' } }), res, next);
+    await aiGateMiddleware(mockReq({ user: { _id: 'u1' } }), mockRes(), next);
     expect(next).toHaveBeenCalled();
   });
 
-  it('free user deducts token', async () => {
+  it('free user deducts token via User.find success path', async () => {
+    mockUserFind.mockResolvedValue({ _id: 'u1', aiTokensRemaining: 3 });
+    mockUserWhere.mockReturnValue({ update: jest.fn().mockResolvedValue(true) });
+    mockSubWhere.mockReturnValue({
+      where: jest.fn().mockReturnThis(),
+      first: jest.fn().mockResolvedValue(null),
+    });
+
+    const req = mockReq({ user: { _id: 'u1' } });
+    const next = jest.fn();
+    await aiGateMiddleware(req, mockRes(), next);
+
+    expect(next).toHaveBeenCalled();
+    expect(req.aiAccessType).toBe('free');
+    expect(req.remainingTokens).toBe(2);
+  });
+
+  it('free user deducts token via User.where fallback', async () => {
     mockUserFind.mockRejectedValue(new Error('no find'));
     mockUserWhere
       .mockReturnValueOnce(chainMock({ _id: 'u1', aiTokensRemaining: 3 }))
@@ -46,11 +65,10 @@ describe('aiGateMiddleware', () => {
       where: jest.fn().mockReturnThis(),
       first: jest.fn().mockResolvedValue(null),
     });
+
     const next = jest.fn();
-    const res = mockRes();
-    await aiGateMiddleware(mockReq({ user: { _id: 'u1' } }), res, next);
+    await aiGateMiddleware(mockReq({ user: { _id: 'u1' } }), mockRes(), next);
     expect(next).toHaveBeenCalled();
-    expect(mockReq().aiAccessType).toBeUndefined(); // set on req object passed in
   });
 
   it('403 when tokens exhausted', async () => {
@@ -85,7 +103,8 @@ describe('aiGateMiddleware', () => {
     mockUserFind.mockResolvedValue({ _id: 'u1', aiTokensRemaining: 2 });
     mockSubWhere.mockImplementation(() => { throw new Error('sub db'); });
     mockUserWhere.mockReturnValue({ update: jest.fn().mockResolvedValue(true) });
-    const req = mockReq({ user: { id: 'u1' } }); // branch req.user.id
+
+    const req = mockReq({ user: { id: 'u1' } });
     const next = jest.fn();
     await aiGateMiddleware(req, mockRes(), next);
     expect(next).toHaveBeenCalled();

@@ -9,7 +9,6 @@ export default {
     '!src/**/routes.js',
     '!src/models/**',
     '!src/config/**',
-    '!src/database.js',
     '!src/subscription/expiry.job.js',
     '!src/ai/groq.service.js',
     '!src/ai/groq.config.js',

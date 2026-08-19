@@ -31,6 +31,28 @@ describe('getNearbyShowrooms', () => {
     await getNearbyShowrooms(mockReq({ query: { lat: '-6.2', lng: '106.8' } }), res);
     expect(getStatus(res)).toBe(200);
     expect(getJson(res).source).toBe('google_places');
+    expect(getJson(res).brand).toBeNull();
+  });
+
+  it('200 from google_places with brand filter', async () => {
+    mockFetchGooglePlaces.mockResolvedValue([
+      { name: 'Toyota Astra', lat: -6.21, lng: 106.81 },
+    ]);
+    const res = mockRes();
+    await getNearbyShowrooms(mockReq({
+      query: { lat: '-6.2', lng: '106.8', brand: 'Toyota' },
+    }), res);
+    expect(getStatus(res)).toBe(200);
+    expect(getJson(res).brand).toBe('Toyota');
+  });
+
+  it('200 from seed when google places returns empty', async () => {
+    mockFetchGooglePlaces.mockResolvedValue([]);
+    mockFetchSeedShowrooms.mockReturnValue([{ name: 'Seed', distanceKm: 1 }]);
+    const res = mockRes();
+    await getNearbyShowrooms(mockReq({ query: { lat: '-6.2', lng: '106.8' } }), res);
+    expect(getStatus(res)).toBe(200);
+    expect(getJson(res).source).toBe('seed');
   });
 
   it('200 from seed on places failure', async () => {
