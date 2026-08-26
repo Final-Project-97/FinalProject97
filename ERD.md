@@ -3,7 +3,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Versi** | 1.3 |
+| **Versi** | 1.4 |
 | **Database** | MongoDB |
 | **ORM** | Mongoloquent |
 | **Collections** | 5 |
@@ -16,7 +16,7 @@ ERD MVP Lite: **5 koleksi MongoDB** untuk data yang perlu persist.
 
 | # | Collection | Tujuan |
 |---|------------|--------|
-| 1 | `users` | Profil buyer (Google OAuth) + kuota AI free tier |
+| 1 | `users` | Profil buyer (email/password **atau** Google OAuth) + kuota AI free tier |
 | 2 | `cars` | Katalog mobil (CarAPI sync + enrichment manual) |
 | 3 | `wishlists` | Mobil tersimpan user (+ metadata dari rekomendasi AI) |
 | 4 | `subscriptions` | Langganan premium **+ riwayat pembayaran Midtrans** (digabung) |
@@ -36,6 +36,7 @@ erDiagram
     USERS {
         ObjectId _id PK
         string email UK
+        string passwordHash
         string googleId UK
         string name
         string avatarUrl
@@ -83,7 +84,7 @@ erDiagram
 
     SUBSCRIPTIONS {
         ObjectId _id PK
-        ObjectId userId FK_UK
+        ObjectId userId FK "UK"
         date expiresAt
         date startedAt
         string orderId UK
@@ -138,8 +139,9 @@ Status langganan **tidak** memakai kolom `plan` / `status` terpisah. Cukup **`su
 ```javascript
 {
   _id: ObjectId,
-  email: String,           // unique, required
-  googleId: String,        // unique, required
+  email: String,           // unique, required (lowercase)
+  passwordHash: String,    // bcrypt — required untuk register lokal; kosong jika Google-only
+  googleId: String,        // unique sparse — required untuk Google; kosong jika email/password-only
   name: String,
   avatarUrl: String,
   role: { type: String, default: "buyer", enum: ["buyer"] },
@@ -154,7 +156,13 @@ Status langganan **tidak** memakai kolom `plan` / `status` terpisah. Cukup **`su
 }
 ```
 
-**Indexes:** `{ email: 1 }` unique, `{ googleId: 1 }` unique
+**Indexes:** `{ email: 1 }` unique, `{ googleId: 1 }` unique **sparse** (boleh `null` untuk user lokal)
+
+**Constraint:** minimal salah satu dari `passwordHash` **atau** `googleId` terisi. User boleh punya keduanya (link Google ke akun lokal by email).
+
+**API:** `passwordHash` **tidak pernah** dikirim di response (`GET /api/auth/me`, dll.).
+
+**Owner:** Mail (`ML-01` model, `ML-02` register/login + Google).
 
 ---
 
