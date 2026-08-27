@@ -1,28 +1,25 @@
-import { Car } from "../models/car.model.js";
+import Car from "../models/car.model.js";
 
 export const getCars = async (req, res) => {
   try {
     const { brand, type } = req.query;
-    let query = ("status", "active");
 
-    if (brand) query.brand = new RegExp("brand", "regex", brand); // Pencarian case-insensitive
-    if (type) query.type = new RegExp("type", "regex", type);
+    let query = Car.where("status", "active");
+    if (brand) query = query.where("brand", "like", brand);
+    if (type) query = query.where("type", "like", type);
 
-    const cars = await Car.where(query).get();
+    const cars = await query.get();
+
     return res.status(200).json({
       success: true,
       count: cars.length,
       data: cars,
     });
   } catch (error) {
-    console.log("[Controllor] gagal mengambil daftar car: ", error);
-    return res
-      .status(500)
-      .json({ success: false, message: "Kesalahan internal server" });
+    console.error("[cars/list]", error);
+    return res.status(500).json({ success: false, message: "Kesalahan internal server" });
   }
 };
-
-// ini untuk home, 1 top pruduction si car nya bisa di gunakan untu yang 360
 
 export const getTopCar = async (req, res) => {
   try {
@@ -31,19 +28,13 @@ export const getTopCar = async (req, res) => {
       .first();
 
     if (!topCar) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Top product tidak ditemukan" });
+      return res.status(404).json({ success: false, message: "Top product belum di-set" });
     }
-    return res.status(200).json({
-      success: true,
-      data: topCar,
-    });
+
+    return res.status(200).json({ success: true, data: topCar });
   } catch (error) {
-    console.log("[Controllor] gagal mengambil daftar car: ", error);
-    return res
-      .status(500)
-      .json({ success: false, message: "Kesalahan internal server" });
+    console.error("[cars/top]", error);
+    return res.status(500).json({ success: false, message: "Kesalahan internal server" });
   }
 };
 
@@ -51,28 +42,18 @@ export const getCarById = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // pencarian via ID ObjectId atau via custom slug
-    let car = null;
-    if (id.length === 24) {
-      car = await Car.find(id);
-    } else {
-      car = await Car.where("slug", id).first();
-    }
+    const car =
+      id.length === 24
+        ? await Car.where("_id", id).first()
+        : await Car.where("slug", id).first();
 
     if (!car) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Mobil tidak ditemukan" });
+      return res.status(404).json({ success: false, message: "Mobil tidak ditemukan" });
     }
 
-    return res.status(200).json({
-      success: true,
-      data: car,
-    });
+    return res.status(200).json({ success: true, data: car });
   } catch (error) {
-    console.error("[Controller] Gagal mengambil detail mobil:", error);
-    return res
-      .status(500)
-      .json({ success: false, message: "Kesalahan internal server" });
+    console.error("[cars/detail]", error);
+    return res.status(500).json({ success: false, message: "Kesalahan internal server" });
   }
 };

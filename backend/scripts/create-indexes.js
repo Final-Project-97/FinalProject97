@@ -35,7 +35,20 @@ async function createIndexes() {
     { key: { feature: 1, createdAt: -1 } },
   ]);
 
-  console.log('ML-01 indexes OK');
+  await db.collection('cars').createIndexes([
+    { key: { slug: 1 }, unique: true, name: 'cars_slug_unique' },
+    { key: { brand: 1, type: 1 }, name: 'cars_brand_type' },
+    { key: { isTopProduct: 1, status: 1 }, name: 'cars_top_status' },
+    {
+      key: { externalSource: 1, externalId: 1 },
+      unique: true,
+      sparse: true,
+      name: 'cars_external_unique',
+    },
+    { key: { status: 1 }, name: 'cars_status' },
+  ]);
+
+  console.log('ML-01 + AL-02 indexes OK');
   process.exit(0);
 }
 

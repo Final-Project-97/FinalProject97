@@ -1,0 +1,12 @@
+process.env.NODE_ENV = 'test';
+process.env.JWT_SECRET = 'test-jwt-secret-min-32-chars-long';
+process.env.GOOGLE_CLIENT_ID = 'test-google-client-id';
+process.env.GROQ_API_KEY = 'gsk_test';
+process.env.GROQ_MODEL = 'openai/gpt-oss-120b';
+process.env.MIDTRANS_SERVER_KEY = 'SB-Mid-server-test';
+process.env.MIDTRANS_CLIENT_KEY = 'SB-Mid-client-test';
+process.env.MIDTRANS_IS_PRODUCTION = 'false';
+process.env.PREMIUM_MONTHLY_PRICE = '99000';
+process.env.MONGODB_URI = 'mongodb://localhost:27017';
+process.env.MONGODB_DB_NAME = 'rac-ai-test';
+process.env.CORS_ORIGIN = 'http://localhost:5173';
