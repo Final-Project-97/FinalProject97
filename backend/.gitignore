@@ -28,3 +28,7 @@ node_modules/
 .env.local
 dist/
 .DS_Store
+
+atlas-credentials.env
+atlas-credentials.*
+coverage/

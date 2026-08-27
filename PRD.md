@@ -3,7 +3,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Versi** | 1.3 (MVP Lite + CarAPI + ERD simplification) |
+| **Versi** | 1.4 (MVP Lite + email/password auth + CarAPI + ERD simplification) |
 | **Timeline** | 7 hari penuh |
 | **Tim** | 4 orang |
 | **Platform** | Web SPA, mobile-first |
@@ -17,7 +17,7 @@ RAC (Recommendation Auto Car) AI adalah aplikasi web mobile-first yang membantu 
 
 MVP difokuskan pada **satu alur utama**: user masuk → dapat rekomendasi mobil → lihat detail & warna → simpan ke wishlist → (opsional) simulasi kredit → temukan showroom terdekat. Fitur premium (AI unlimited) dijual via Midtrans.
 
-**MVP Lite:** katalog mobil via **CarAPI.app sync** + override manual; showroom **seed** + Google Places **1x/session** (Opsi A); **tanpa admin panel**; auth **Google buyer only**.
+**MVP Lite:** katalog mobil via **CarAPI.app sync** + override manual; showroom **seed** + Google Places **1x/session** (Opsi A); **tanpa admin panel**; auth **email/password + Google**, role **buyer only**.
 
 ---
 
@@ -30,7 +30,7 @@ MVP difokuskan pada **satu alur utama**: user masuk → dapat rekomendasi mobil 
 | 1 | User dapat rekomendasi mobil berbasis form + AI | ≥ 1 rekomendasi valid per sesi |
 | 2 | User dapat eksplorasi produk (360°, warna, deskripsi) | Bounce rate detail < 60% |
 | 3 | Monetisasi freemium via Midtrans | Flow pembayaran end-to-end berhasil |
-| 4 | Auth Google + wishlist berfungsi | Login & CRUD wishlist tanpa error |
+| 4 | Auth (email/password + Google) + wishlist berfungsi | Register, login, & CRUD wishlist tanpa error |
 
 ### 2.2 In Scope (MVP Lite)
 
@@ -39,7 +39,7 @@ MVP difokuskan pada **satu alur utama**: user masuk → dapat rekomendasi mobil 
 - Halaman detail produk: deskripsi, swap gambar per warna, ketersediaan warna
 - Chatbot AI (LangChain + Groq/OpenAI)
 - Simulasi kredit (form + perhitungan AI-assisted)
-- Auth: Sign in with Google + JWT, role **`buyer` only**
+- Auth: Register/login email+password **dan** Sign in with Google + JWT, role **`buyer` only**
 - CRUD wishlist
 - Subscription freemium: free 5x AI → token habis → upgrade premium monthly (Midtrans)
 - **Katalog mobil:** sync **[CarAPI.app](https://carapi.app/)** (specs YMMT) → MongoDB + **enrichment manual** (harga IDR, warna, CI360)
@@ -53,7 +53,7 @@ MVP difokuskan pada **satu alur utama**: user masuk → dapat rekomendasi mobil 
 | **Showroom** | Opsi A: Places → fallback seed JSON | Runtime only; seed di `config/showrooms.seed.json` (bukan MongoDB) |
 | **Google Places** | **1x per session** (frontend Context + `sessionStorage`) | Backend stateless |
 | **Admin** | Skip | Sync via script; enrichment via JSON |
-| **Auth** | Google OAuth buyer only | JWT 24h |
+| **Auth** | Email/password + Google OAuth, buyer only | JWT 24h; collection `users` |
 
 ---
 
@@ -132,7 +132,7 @@ MVP difokuskan pada **satu alur utama**: user masuk → dapat rekomendasi mobil 
 | Detail colors | One image per color | Image swap on select |
 | Server | Node.js + Express | REST API |
 | Validation | Zod | Request schemas |
-| Auth | JWT + Google OAuth | Role: **buyer only** |
+| Auth | JWT + email/password (bcrypt) + Google OAuth | Role: **buyer only**; 1 collection `users` |
 | Database | MongoDB | Atlas or local |
 | ORM | Mongoloquent | Models + validation |
 | Car catalog | [CarAPI.app](https://carapi.app/) | Sync specs (server-side); free demo dataset 2015–2020 |
@@ -189,7 +189,6 @@ MVP difokuskan pada **satu alur utama**: user masuk → dapat rekomendasi mobil 
 | CB-02 | Context-aware: tahu katalog mobil dari DB | P0 |
 | CB-03 | Setiap message user = -1 AI token (free tier) | P0 |
 | CB-04 | Block chat jika token habis + prompt upgrade | P0 |
-| CB-05 | ~~Simpan riwayat sesi~~ | **Out** — chat stateless, tidak persist |
 
 **Contoh intent:** "Mobil apa cocok budget 300 juta keluarga 5 orang?"
 
@@ -208,12 +207,31 @@ MVP difokuskan pada **satu alur utama**: user masuk → dapat rekomendasi mobil 
 
 ### 6.5 Authentication
 
+Satu collection `users` (ERD §4.1) untuk **semua** cara masuk. Owner API: **Mail**.
+
 | ID | Requirement | Priority |
 |----|-------------|----------|
 | AU-01 | Sign in with Google (OAuth 2.0) | P0 |
 | AU-02 | Issue JWT (access token, expiry 24h) | P0 |
 | AU-03 | Role fixed: `buyer` (default & only) | P0 |
 | AU-04 | Protected routes: wishlist, subscription | P0 |
+| AU-05 | **Register** email + password → hash bcrypt, insert `users` | P0 |
+| AU-06 | **Login** email + password → verify hash → JWT | P0 |
+
+**Register (AU-05):**
+- Body: `name`, `email`, `password` (Zod: email valid, password min 8 karakter)
+- Email unique (case-insensitive)
+- Simpan `passwordHash` (bcrypt); **jangan** simpan plain password
+- User baru: `role=buyer`, `aiTokensRemaining=5`, `googleId` kosong, belum ada `subscriptions` (SU-01)
+- Sukses → issue JWT 24h (sama seperti Google)
+
+**Login (AU-06):**
+- Body: `email`, `password`
+- Cari `users` by email; bandingkan bcrypt
+- User Google-only (punya `googleId`, tanpa `passwordHash`) → `400` minta login via Google
+- Email/password salah → `401` generik ("Email atau password salah") — jangan bocorkan apakah email terdaftar
+
+**Google (AU-01) tetap:** upsert by `googleId` atau email yang sama. Jika email sudah register lokal, **link** `googleId` ke record itu (jangan buat user duplikat).
 
 ---
 
@@ -329,8 +347,10 @@ npm run sync:cars
 ### Auth
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/api/auth/google` | Google OAuth → JWT |
-| GET | `/api/auth/me` | Current user + subscription |
+| POST | `/api/auth/register` | Email + password → create `users` + JWT |
+| POST | `/api/auth/login` | Email + password → JWT |
+| POST | `/api/auth/google` | Google OAuth → JWT (link ke `users` by email jika sudah ada) |
+| GET | `/api/auth/me` | Current user + subscription (**tanpa** `passwordHash`) |
 | POST | `/api/auth/logout` | Invalidate token (client-side) |
 
 ### Cars (read-only, data from CarAPI sync)
@@ -433,7 +453,7 @@ sequenceDiagram
     participant GP as Google Places
     participant Seed as showrooms.seed.json
 
-    U->>FE: Buka app / login
+    U->>FE: Buka app / login (email atau Google)
     FE->>U: Minta GPS (1x)
     U->>FE: lat, lng
     FE->>BE: GET /showrooms/nearby (1x per session)
@@ -461,6 +481,28 @@ flowchart LR
     E[Frontend GET /api/cars] --> D
 ```
 
+### 9.5 Flow Auth (email/password + Google)
+
+```mermaid
+flowchart TD
+    A[Halaman Auth] --> B{Pilih cara}
+    B -->|Daftar| C[POST /api/auth/register]
+    B -->|Masuk email| D[POST /api/auth/login]
+    B -->|Google| E[POST /api/auth/google]
+    C --> F{Email sudah ada?}
+    F -->|Ya| G[409 EMAIL_TAKEN]
+    F -->|Tidak| H[Hash bcrypt → insert users]
+    H --> I[JWT 24h]
+    D --> J{Email + hash OK?}
+    J -->|Tidak| K[401]
+    J -->|Ya| I
+    E --> L[Upsert users by googleId / email]
+    L --> I
+    I --> M[GET /api/auth/me]
+```
+
+Owner implementasi: **Mail** (`backend/src/auth/` + model `users`). UI form: **Brian**.
+
 ---
 
 ## 10. Pembagian Tim (7 Hari)
@@ -468,7 +510,7 @@ flowchart LR
 | Hari | Frontend (2 dev) | Backend (1 dev) | Full-stack / AI (1 dev) |
 |------|------------------|-----------------|-------------------------|
 | **D1** | Setup React + Tailwind + ShowroomProvider | Express + Mongo + CarAPI sync POC | AI/LangChain POC + schema |
-| **D2** | Homepage + CI360 + GPS session init | CarAPI mapper + enrichment merge + read API | Google OAuth + JWT |
+| **D2** | Homepage + CI360 + GPS session init | CarAPI mapper + enrichment merge + read API | Auth email/password + Google OAuth + JWT |
 | **D3** | Detail produk + color swap | Wishlist API | AI recommend endpoint |
 | **D4** | Form rekomendasi UI + results | Showrooms Opsi A (Places + seed) | Chatbot LangChain |
 | **D5** | Chatbot UI + credit form | Subscription + Midtrans webhook | Credit AI simulation |
@@ -494,7 +536,7 @@ flowchart LR
 
 - [ ] Semua requirement P0 terimplementasi
 - [ ] Mobile layout diuji di viewport 375px
-- [ ] Auth Google + JWT berfungsi
+- [ ] Auth register/login email+password + Google + JWT berfungsi
 - [ ] AI token decrement + block saat habis
 - [ ] Midtrans payment sandbox success → premium active 30 hari
 - [ ] Premium expired → AI blocked + prompt re-subscribe
@@ -556,3 +598,4 @@ VITE_MIDTRANS_CLIENT_KEY=
 | **Showroom Session** | Fetch nearby 1x per browser session |
 | **Opsi A** | Places primary, seed fallback |
 | **Mongoloquent** | ODM/ORM untuk MongoDB di Node.js |
+| **Local auth** | Register/login email + password (bcrypt) di collection `users` — owner **Mail** |
