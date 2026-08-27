@@ -158,17 +158,17 @@ export default function Wishlist() {
                       />
                     </div>
 
-                    {/* Brand, Name, & Price Row */}
-                    <div className="flex items-start justify-between gap-3 mb-4">
-                      <div>
-                        <span className="text-[11px] font-bold text-blue-400 uppercase tracking-wider block">
-                          {car?.brand || "RAC"}
-                        </span>
-                        <h3 className="text-base font-extrabold text-white mt-0.5 group-hover:text-blue-400 transition-colors truncate">
-                          {car?.name || "Vehicle"}
-                        </h3>
-                      </div>
-                      <span className="text-sm font-extrabold text-white shrink-0">
+                    {/* FIX: Changed from horizontal flex to vertical stack to prevent text overflow */}
+                    <div className="mb-4">
+                      <span className="text-[11px] font-bold text-blue-400 uppercase tracking-wider block">
+                        {car?.brand || "RAC"}
+                      </span>
+                      {/* FIX: Allow long car names to wrap instead of truncate */}
+                      <h3 className="text-bold font-extrabold text-white mt-0.5 group-hover:text-blue-500 transition-colors break-words">
+                        {car?.name || "Vehicle"}
+                      </h3>
+                      {/* FIX: Price on its own line so it never gets cut off */}
+                      <span className="text-sm font-extrabold text-white mt-1 block">
                         {formatPrice(car?.basePrice)}
                       </span>
                     </div>
@@ -211,11 +211,13 @@ export default function Wishlist() {
                       <div className="space-y-2 py-3.5 border-y border-white/5 text-xs text-gray-400 mb-5">
                         <div className="flex justify-between items-center">
                           <span>Preferred color</span>
-                          <span className="text-gray-200 font-medium">{item.selectedColor || "Default"}</span>
+                          {/* FIX: Allow long color names to wrap instead of overflow */}
+                          <span className="text-gray-200 font-medium text-right break-words max-w-[60%]">{item.selectedColor || "Default"}</span>
                         </div>
                         <div className="flex justify-between items-center">
                           <span>Notes</span>
-                          <span className="text-gray-200 font-medium truncate max-w-[180px]">{item.notes || "-"}</span>
+                          {/* FIX: Allow notes text to wrap properly */}
+                          <span className="text-gray-200 font-medium text-right break-words max-w-[60%]">{item.notes || "-"}</span>
                         </div>
                       </div>
                     )}
